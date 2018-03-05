@@ -20,7 +20,7 @@ Add lines to .cfg/info/sparse-checkout
 ```
 
 ```
-git clone --bare https://bitbucket.org/durdn/cfg.git $HOME/.cfg
+git clone --bare git@github.com:rhyeung/dotfiles.git $HOME/.cfg
 function config {
    /usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME $@
 }
@@ -33,5 +33,6 @@ if [ $? = 0 ]; then
     config checkout 2>&1 | egrep "\s+\." | awk {'print $1'} | xargs -I{} mv {} .config-backup/{}
 fi;
 config checkout
-config config status.showUntrackedFiles no
+config config --local status.showUntrackedFiles no
+config config --local core.sparsecheckout true
 ```
