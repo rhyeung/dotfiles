@@ -115,8 +115,8 @@ au BufRead,BufNewFile *.html let b:comment_leader = '<!--'
 filetype off                  " required
 
 " -----From pathogen-----
-call pathogen#infect()
-call pathogen#helptags()
+"call pathogen#infect()
+"call pathogen#helptags()
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
