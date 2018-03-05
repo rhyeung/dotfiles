@@ -11,14 +11,17 @@ config config --local status.showUntrackedFiles no
 config config --local core.sparsecheckout true
 echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.bashrc
 ```
-
-## Add pull ignore files
-Add lines to .cfg/info/sparse-checkout
+## Add commit ignore files
+Add lines to .gitignore
 ```
-/*
-!README.md
-```
+#Patterns to ignore
+.vim/bundle/*
+.vim/bundle/Vundle.vim/.git
+README.md
 
+#Patterns not ignored
+!.vim/bundle/Vundle.vim
+```
 ## Short URL for install script
 http://bit.do/cfg-install-sh
 
@@ -40,3 +43,11 @@ config checkout
 config config --local status.showUntrackedFiles no
 config config --local core.sparsecheckout true
 ```
+## Add pull ignore files
+Add lines to .cfg/info/sparse-checkout
+```
+/*
+!README.md
+```
+
+
