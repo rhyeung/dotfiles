@@ -1,6 +1,6 @@
 # Manages my dotfiles
 
-## Short URL
+## Short URL for init script
 http://bit.do/cfg-init-sh
 
 ```
@@ -19,7 +19,11 @@ Add lines to .cfg/info/sparse-checkout
 !README.md
 ```
 
+## Short URL for install script
+http://bit.do/cfg-install-sh
+
 ```
+#!/usr/bin/bash
 git clone --bare git@github.com:rhyeung/dotfiles.git $HOME/.cfg
 function config {
    /usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME $@
