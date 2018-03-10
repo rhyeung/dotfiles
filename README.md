@@ -4,9 +4,11 @@
 http://bit.do/cfg-init-sh
 
 ```
-#!/usr/bin/bash
-git init --bare $HOME/.cfg
-alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+#!/usr/bin/env bash
+
+GIT=`which git`
+$GIT init --bare $HOME/.cfg
+alias config='$GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 config config --local status.showUntrackedFiles no
 config config --local core.sparsecheckout true
 echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.bashrc
