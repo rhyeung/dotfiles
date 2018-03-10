@@ -8,6 +8,11 @@ case $- in
       *) return;;
 esac
 
+# Check OS type
+if [ $OSTYPE == "linux-gnueabi" ]; then
+    source ~/.chromeos
+fi
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -105,7 +110,8 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+GIT=`which git`
+alias config='$GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -141,5 +147,9 @@ else
      start_agent;
 fi
 
+# Set editor to vim
+EDITOR=`which vim`
+
+export EDITOR
 # Set vi mode
 set -o vi
