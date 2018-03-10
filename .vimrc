@@ -247,11 +247,10 @@ let g:pymode_rope_goto_definition_bind = "<C-]>"
 let g:pymode_run_bind = "<leader>r"
 
 " Override view python doc key shortcut to Ctrl-Shift-d
-let g:pymode_doc_bind = "<C-S-d>"
+let g:pymode_doc_bind = "<leader>d"
 
 " -----From Airline-----
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_theme='solarized'
 "let g:airline_solarized_bg='light'
-
 let g:airline_powerline_fonts = 1
