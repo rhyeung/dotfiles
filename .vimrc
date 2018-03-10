@@ -10,7 +10,9 @@ set showcmd
 set number
 set backspace=indent,eol,start
 let mapleader = ","
-if has('win32') || has('win64')
+if has("unix")
+  let s:arch = substitute(system("uname -m"), '\n', '', '')
+elseif has('win32') || has('win64')
   set rtp+=$HOME/../../../CygwinPortable/home/z/.vim
 endif
 "let g:solarized_termtrans=0
@@ -146,8 +148,13 @@ Plugin 'python-mode/python-mode'
 "Plugin 'davidhalter/jedi-vim'
 "Plugin 'nvie/vim-flake8'
 "Plugin 'Valloric/YouCompleteMe'
-Plugin 'Shougo/neocomplete.vim'
+"Plugin 'Shougo/neocomplete.vim'
 "Plugin 'Townk/vim-autoclose'
+if s:arch == "aarch64"
+  Plugin 'davidhalter/jedi-vim'
+else
+  Plugin 'Shougo/neocomplete.vim'
+endif
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -190,11 +197,15 @@ autocmd BufWinEnter *.py setlocal foldexpr=SimpylFold(v:lnum) foldmethod=expr
 autocmd BufWinLeave *.py setlocal foldexpr< foldmethod<
 let g:SimpylFold_docstring_preview = 1
 
-" -----From Jedi-----
-let g:jedi#auto_initialization = 0
-
-" ----From Neocomplete-----
-let g:neocomplete#enable_at_startup = 1
+if s:arch == "aarch64"
+  " -----From Jedi-----
+  let g:jedi#auto_initialization = 1
+  let g:neocomplete#enable_at_startup = 0
+else
+  " ----From Neocomplete-----
+  let g:jedi#auto_initialization = 1
+  let g:neocomplete#enable_at_startup = 0
+endif
 
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
