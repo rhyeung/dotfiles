@@ -26,10 +26,12 @@ README.md
 http://bit.do/cfg-install-sh
 
 ```
-#!/usr/bin/bash
-git clone --bare git@github.com:rhyeung/dotfiles.git $HOME/.cfg
+#!/usr/bin/env bash
+
+GIT=`which git`
+$GIT clone --bare git@github.com:rhyeung/dotfiles.git $HOME/.cfg
 function config {
-   /usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME $@
+   $GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME $@
 }
 mkdir -p .config-backup
 config checkout
@@ -43,6 +45,7 @@ config checkout
 config config --local status.showUntrackedFiles no
 config config --local core.sparsecheckout true
 ```
+
 ## Add pull ignore files
 Add lines to .cfg/info/sparse-checkout
 ```
