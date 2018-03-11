@@ -245,7 +245,7 @@ let g:pymode_rope_goto_definition_bind = "<C-]>"
 
 " Override run current python file key shortcut to Ctrl-Shift-e
 "let g:pymode_run_bind = "<C-S-e>"
-let g:pymode_run_bind = "<C-S-a>"
+let g:pymode_run_bind = "<C-S-r>"
 "let g:pymode_run_bind = "<leader>r"
 
 " Override view python doc key shortcut to Ctrl-Shift-d
