@@ -75,6 +75,7 @@ au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
 au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /\s\+$/
 au         BufNewFile *.py,*.pyw set fileformat=unix
 au BufRead,BufNewFile *.py,*.pyw let b:comment_leader = '#'
+au BufRead,BufNewFile *.py,*.pyw autocmd BufEnter __run__,__doc__ :wincmd L
 
 " JS
 au BufRead,BufNewFile *.js set expandtab
@@ -206,7 +207,7 @@ else
   let g:jedi#auto_initialization = 0
   let g:neocomplete#enable_at_startup = 1
   inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-  inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+  "inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
   inoremap <expr><C-g>     neocomplete#undo_completion()
   inoremap <expr><C-l>     neocomplete#complete_common_string()
 endif
@@ -244,7 +245,8 @@ let g:pymode_rope_goto_definition_bind = "<C-]>"
 
 " Override run current python file key shortcut to Ctrl-Shift-e
 "let g:pymode_run_bind = "<C-S-e>"
-let g:pymode_run_bind = "<leader>r"
+let g:pymode_run_bind = "<C-S-a>"
+"let g:pymode_run_bind = "<leader>r"
 
 " Override view python doc key shortcut to Ctrl-Shift-d
 let g:pymode_doc_bind = "<leader>d"
