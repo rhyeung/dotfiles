@@ -1,0 +1,35 @@
+# Mount the portable Documents folder, if it isn't already
+#if [ ! -d Documents ]; then
+#  mount -f $(cygpath -m $USBDRVPATH)Documents /home/${USER}/Documents;
+#fi
+
+# Set correct permission for Python Egg directory
+if [ -d ${HOME}/.cache/Python-Eggs ]; then
+  chmod 0700 ${HOME}/.cache/Python-Eggs
+fi
+
+# Figure out where Adobe Reader or Acrobat is
+acropath=$(
+  cygpath -m $(
+    echo $(
+      reg query HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes\\acrobat\\shell\\open\\command /ve | awk -F"\"" '{ print $2 }'
+    )
+  )
+)
+
+# alias ls='ls --color'
+alias acrobat='cyg-wrapper.sh "$(echo $acropath)"'
+alias gvim='cyg-wrapper.sh "$USBDRV/PortableApps/gVimPortable/gvimPortable.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
+alias st='cyg-wrapper.sh "$USBDRV/PortableApps/SublimeText/sublime_text.exe" --fork=2'
+alias st3='cyg-wrapper.sh "$USBDRV/PortableApps/SublimeText3/sublime_text.exe" --fork=2'
+alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
+alias gtypist='gtypist -wi'
+alias explorer='cyg-wrapper.sh "explorer" --slashed-opt'
+alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -unixkill"'
+alias sumatra='startSumatra.sh'
+alias lynx='lynx -use_mouse'
+alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
+alias units='rlwrap units'
+alias multivalent='java -cp $(cygpath -m $CYGROOT)/home/${USER}/usr/lib/Multivalent20060102.jar'
+alias ppip='pip --disable-pip-version-check'
+alias vi='vim -u NONE'

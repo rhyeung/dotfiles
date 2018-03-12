@@ -161,3 +161,4 @@ export EDITOR
 
 # Set vi mode
 set -o vi
+alias config='/usr/bin/git --git-dir=/home/z/.cfg/ --work-tree=/home/z'
