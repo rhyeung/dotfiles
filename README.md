@@ -37,7 +37,7 @@ README.md
 !.vim/bundle/Vundle.vim
 ```
 ## Short URL for install script
-http://bit.do/cfg-install-sh
+http://bit.ly/cfg-install-sh
 
 ```
 #!/usr/bin/env bash
