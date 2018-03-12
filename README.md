@@ -1,5 +1,17 @@
 # Manages my dotfiles
 
+## Using spf13 for vim
+https://github.com/spf13/spf13-vim
+
+Run either:
+```
+curl https://j.mp/spf13-vim3 -L > spf13-vim.sh && sh spf13-vim.sh
+```
+or
+```
+sh <(curl https://j.mp/spf13-vim3 -L)
+```
+
 ## Short URL for init script
 http://bit.do/cfg-init-sh
 
