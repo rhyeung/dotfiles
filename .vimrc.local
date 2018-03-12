@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 " Global
 set nospell
 
@@ -20,5 +19,3 @@ endif
 
 " Pymode
 let g:pymode_run_bind = "<leader>ru"
-=======
->>>>>>> 6f54580bf9c71bc5f387c507b9b6917efeac8b0b
