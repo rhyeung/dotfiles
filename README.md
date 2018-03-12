@@ -13,7 +13,7 @@ sh <(curl https://j.mp/spf13-vim3 -L)
 ```
 
 ## Short URL for init script
-http://bit.ly/cfg-init-sh
+curl -L http://bit.ly/cfg-init-sh | bash -x
 
 ```
 #!/usr/bin/env bash
@@ -37,7 +37,7 @@ README.md
 !.vim/bundle/Vundle.vim
 ```
 ## Short URL for install script
-http://bit.ly/cfg-install-sh
+curl -L http://bit.ly/cfg-install-sh | bash -x
 
 ```
 #!/usr/bin/env bash
