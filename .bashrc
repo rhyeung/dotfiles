@@ -10,9 +10,9 @@ esac
 
 # Check OS type
 if [ $OSTYPE == "linux-gnueabi" ]; then
-    source ~/.chromeos
+    source ~/.bashrc.chromeos
 elif [ $OSTYPE == "cygwin" ]; then
-    source ~/.cygwin
+    source ~/.bashrc.cygwin
 fi
 
 # Go home
