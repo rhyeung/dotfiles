@@ -13,7 +13,7 @@ sh <(curl https://j.mp/spf13-vim3 -L)
 ```
 
 ## Short URL for init script
-http://bit.do/cfg-init-sh
+http://bit.ly/cfg-init-sh
 
 ```
 #!/usr/bin/env bash
