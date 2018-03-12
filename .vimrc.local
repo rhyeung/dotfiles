@@ -1,0 +1,11 @@
+" Global
+set nospell
+
+" Key mapping
+imap fd <Esc>
+
+" Jedi
+let g:jedi#auto_initialization = 1
+
+" Neocomplete
+let g:neocomplete#enable_at_startup = 0
