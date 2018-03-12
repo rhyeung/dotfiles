@@ -1,4 +1,4 @@
-# Manages my dotfiles
+# To manage and sync my dotfiles
 
 ## Using spf13 for vim
 https://github.com/spf13/spf13-vim
