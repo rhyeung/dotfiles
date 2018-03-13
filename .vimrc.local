@@ -4,17 +4,15 @@ set nospell
 " Key mapping
 imap fd <Esc>
 
-" Default auto completion
-let g:neocomplete#enable_at_startup = 1
-let g:jedi#auto_initialization = 0
-
 " On my arm Chromebook
 if substitute(system("uname -m"), '\n', '', '') == "aarch64"
   " Jedi
   let g:jedi#auto_initialization = 1
+  let g:neocomplete#enable_at_startup = 0
 else
   " Neocomplete
   let g:neocomplete#enable_at_startup = 0
+  let g:jedi#auto_initialization = 1
 endif
 
 " Pymode
