@@ -22,6 +22,7 @@
 # a patch to the cygwin mailing list.
 
 # User dependent .bash_profile file
+TERM=xterm-256color
 
 # source the users bashrc if it exists
 if [ -f "${HOME}/.bashrc" ] ; then
