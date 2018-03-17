@@ -127,3 +127,7 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+if [ -f $HOME/.shellrc ]; then
+    . $HOME/.shellrc
+fi
