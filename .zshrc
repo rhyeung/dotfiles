@@ -60,6 +60,7 @@ ZSH_THEME="agnoster"
 plugins=(
   git
   vi-mode
+  tmux
 )
 
 
@@ -106,7 +107,3 @@ bindkey -M menuselect 'h' vi-backward-char
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 bindkey -M menuselect 'j' vi-down-line-or-history
-
-# dotfiles alias
-GIT=`which git`
-alias config='$GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME'

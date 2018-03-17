@@ -115,9 +115,6 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-GIT=`which git`
-alias config='$GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
@@ -130,34 +127,3 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-
-# Setup ssh-agent
-SSH_ENV="$HOME/.ssh/environment"
-
-function start_agent {
-     echo "Initialising new SSH agent..."
-     /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-     echo succeeded
-     chmod 600 "${SSH_ENV}"
-     . "${SSH_ENV}" > /dev/null
-     /usr/bin/ssh-add;
-}
-
-# Source SSH settings, if applicable
-if [ -f "${SSH_ENV}" ]; then
-     . "${SSH_ENV}" > /dev/null
-     #ps ${SSH_AGENT_PID} doesn't work under cywgin
-     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-         start_agent;
-     }
-else
-     start_agent;
-fi
-
-# Set editor to vim
-EDITOR=`which vim`
-
-export EDITOR
-
-# Set vi mode
-set -o vi

@@ -68,21 +68,9 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# Set key binding to vi
-set -o vi
-
-# Linuxbrew
-export prefix=/usr/local/linuxbrew # wherever you want linuxbrew, but it better be somewhere in /usr/local
-PATH="$prefix/bin:$prefix/sbin:$PATH"
-export HOMEBREW_TEMP=$prefix/tmp
-unset LD_LIBRARY_PATH
-
-# tabtab source for serverless package
-# uninstall by removing these lines or running `tabtab uninstall serverless`
-[ -f /usr/local/linuxbrew/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.bash ] && . /usr/local/linuxbrew/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.bash
-# tabtab source for sls package
-# uninstall by removing these lines or running `tabtab uninstall sls`
-[ -f /usr/local/linuxbrew/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.bash ] && . /usr/local/linuxbrew/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.bash
+# dotfiles alias
+GIT=`which git`
+alias config='$GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
 # Setup ssh-agent
 SSH_ENV="$HOME/.ssh/environment"
@@ -107,3 +95,11 @@ if [ -f "${SSH_ENV}" ]; then
 else
      start_agent;
 fi
+
+# Set editor to vim
+EDITOR=`which vim`
+
+export EDITOR
+
+# Set vi mode
+set -o vi
