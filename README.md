@@ -1,6 +1,6 @@
 # To manage and sync my dotfiles
 
-## Using spf13 for vim
+## Use spf13 to manage vim
 https://github.com/spf13/spf13-vim
 
 Run either:
@@ -11,6 +11,8 @@ or
 ```
 sh <(curl https://j.mp/spf13-vim3 -L)
 ```
+## Use tmux git for tmux config
+https://github.com/gpakosz/.tmux
 
 ## Short URL for init script
 curl -L http://bit.ly/cfg-init-sh | bash -x
