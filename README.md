@@ -14,6 +14,19 @@ sh <(curl https://j.mp/spf13-vim3 -L)
 ## Use tmux git for tmux config
 https://github.com/gpakosz/.tmux
 
+## Install oh-my-zsh
+#### via curl
+
+```shell
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+```
+
+#### via wget
+
+```shell
+sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+```
+
 ## Short URL for init script
 curl -L http://bit.ly/cfg-init-sh | bash -x
 
