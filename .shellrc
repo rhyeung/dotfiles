@@ -70,10 +70,6 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# dotfiles alias
-GIT=`which git`
-alias config='$GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-
 # Setup ssh-agent
 SSH_ENV="$HOME/.ssh/environment"
 
@@ -98,10 +94,16 @@ else
      start_agent;
 fi
 
+# Setup virtualenvwrapper
+if [ -f "/usr/share/virtualenvwrapper/virtualenvwrapper.sh" ]; then
+    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+    if [ -d "$HOME/projects/virtualenvs" ]; then
+        export WORKON_HOME="$HOME/projects/virtualenvs"
+    fi
+fi
+
 # Set editor to vim
-EDITOR=`which vim`
+export EDITOR=`which vim`
 
 # Set vi mode
 set -o vi
-
-export EDITOR
