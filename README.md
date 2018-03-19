@@ -81,10 +81,3 @@ config checkout
 config config --local status.showUntrackedFiles no
 config config --local core.sparsecheckout false
 ```
-
-## Add pull ignore files
-Add lines to .cfg/info/sparse-checkout
-```
-/*
-!README.md
-```
