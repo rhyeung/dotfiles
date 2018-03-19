@@ -44,7 +44,7 @@ GIT=`which git`
 $GIT init --bare $HOME/.cfg
 alias config='$GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 config config --local status.showUntrackedFiles no
-config config --local core.sparsecheckout true
+config config --local core.sparsecheckout false
 echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.bashrc
 ```
 ## Add commit ignore files
@@ -79,7 +79,7 @@ if [ $? = 0 ]; then
 fi;
 config checkout
 config config --local status.showUntrackedFiles no
-config config --local core.sparsecheckout true
+config config --local core.sparsecheckout false
 ```
 
 ## Add pull ignore files
