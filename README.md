@@ -14,6 +14,13 @@ sh <(curl https://j.mp/spf13-vim3 -L)
 ## Use tmux git for tmux config
 https://github.com/gpakosz/.tmux
 
+```
+$ cd
+$ git clone https://github.com/gpakosz/.tmux.git
+$ ln -s -f .tmux/.tmux.conf
+$ cp .tmux/.tmux.conf.local .
+```
+
 ## Install oh-my-zsh
 #### via curl
 
