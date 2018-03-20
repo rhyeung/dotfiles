@@ -14,6 +14,13 @@ sh <(curl https://j.mp/spf13-vim3 -L)
 ## Use tmux git for tmux config
 https://github.com/gpakosz/.tmux
 
+```
+$ cd
+$ git clone https://github.com/gpakosz/.tmux.git
+$ ln -s -f .tmux/.tmux.conf
+$ cp .tmux/.tmux.conf.local .
+```
+
 ## Install oh-my-zsh
 #### via curl
 
@@ -37,7 +44,7 @@ GIT=`which git`
 $GIT init --bare $HOME/.cfg
 alias config='$GIT --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 config config --local status.showUntrackedFiles no
-config config --local core.sparsecheckout true
+config config --local core.sparsecheckout false
 echo "alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'" >> $HOME/.bashrc
 ```
 ## Add commit ignore files
@@ -72,12 +79,5 @@ if [ $? = 0 ]; then
 fi;
 config checkout
 config config --local status.showUntrackedFiles no
-config config --local core.sparsecheckout true
-```
-
-## Add pull ignore files
-Add lines to .cfg/info/sparse-checkout
-```
-/*
-!README.md
+config config --local core.sparsecheckout false
 ```
