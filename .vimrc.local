@@ -16,4 +16,8 @@ else
 endif
 
 " Pymode
-let g:pymode_run_bind = "<leader>ru"
+let g:pymode_run_bind = "<leader>rr"
+
+" Look n feel
+let g:solarized_termcolors=16
+color solarized
