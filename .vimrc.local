@@ -6,18 +6,28 @@ imap fd <Esc>
 
 " On my arm Chromebook
 if substitute(system("uname -m"), '\n', '', '') == "aarch64"
-  " Jedi
-  let g:jedi#auto_initialization = 1
-  let g:neocomplete#enable_at_startup = 0
-else
-  " Neocomplete
-  let g:neocomplete#enable_at_startup = 0
-  let g:jedi#auto_initialization = 1
+    let g:neocomplete#enable_at_startup = 0
 endif
 
-" Pymode
-let g:pymode_run_bind = "<leader>rr"
+"if substitute(system("uname -m"), '\n', '', '') == "aarch64"
+  " Jedi
+  "let g:jedi#auto_initialization = 1
+  "let g:jedi#popup_on_dot = 0
+  "let g:neocomplete#enable_at_startup = 0
+"else
+  " Neocomplete
+  "let g:neocomplete#enable_at_startup = 0
+  "let g:jedi#auto_initialization = 1
+  "let g:neocomplete#disable_auto_complete=1
+  "inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
+"endif
+
+" Turn off Neo pop up
+let g:neocomplete#disable_auto_complete=1
+"inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 
 " Look n feel
+"set background=light
 let g:solarized_termcolors=16
+let g:solarized_termtrans=0
 color solarized

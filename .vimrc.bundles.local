@@ -1,2 +1,5 @@
 UnBundle 'amirh/HTML-AutoCloseTag'
-Bundle 'davidhalter/jedi-vim'
+"Bundle 'davidhalter/jedi-vim'
+Bundle 'plytophogy/vim-virtualenv'
+Bundle 'maralla/completor.vim'
+Bundle 'NLKNguyen/papercolor-theme'

@@ -265,3 +265,7 @@ set -g mouse on
 
 # move status line to top
 set -g status-position top
+
+# run themes and plugins
+run-shell "~/.tmux/themes/nord-tmux/nord.tmux"
+run-shell "~/.tmux/plugins/tmux-prefix-highlight/prefix_highlight.tmux"

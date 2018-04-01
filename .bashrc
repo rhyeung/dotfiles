@@ -131,3 +131,4 @@ fi
 if [ -f $HOME/.shellrc ]; then
     . $HOME/.shellrc
 fi
+(nohup node ~/.crouton-clipboard/server.js > /dev/null 2>&1 &)                                                                          
