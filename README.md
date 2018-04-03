@@ -35,7 +35,7 @@ sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/to
 ```
 
 ## Short URL for init script
-curl -L http://bit.ly/cfg-init-sh | bash -x
+curl -L http://cli.re/L4wM3p | bash -x
 
 ```
 #!/usr/bin/env bash
@@ -59,7 +59,7 @@ README.md
 !.vim/bundle/Vundle.vim
 ```
 ## Short URL for install script
-curl -L http://bit.ly/cfg-install-sh | bash -x
+curl -L http://cli.re/6VqMNv | bash -x
 
 ```
 #!/usr/bin/env bash
