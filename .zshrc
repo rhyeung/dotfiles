@@ -10,9 +10,9 @@ export ZSH=/home/z/.oh-my-zsh
 ZSH_THEME="spaceship"
 #ZSH_THEME="agnoster"
 
-if [[ "$ZSH_THEME" == "spaceship" ]]; then
-    SPACESHIP_BATTERY_SHOW="always"
-fi
+#if [[ "$ZSH_THEME" == "spaceship" ]]; then
+    #SPACESHIP_BATTERY_SHOW="always"
+#fi
 
 # Set list of themes to load
 # Setting this variable when ZSH_THEME=random
