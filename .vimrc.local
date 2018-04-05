@@ -28,6 +28,7 @@ let g:neocomplete#disable_auto_complete=1
 
 " Look n feel
 "set background=light
-let g:solarized_termcolors=16
-let g:solarized_termtrans=0
-color solarized
+"let g:solarized_termcolors=16
+"let g:solarized_termtrans=0
+"color solarized
+color zenburn
