@@ -35,3 +35,15 @@ inoremap <expr> <Tab> pumvisible() ? "<C-N>" : "<C-R>=completor#do('complete')<C
 "color solarized
 colors zenburn
 let g:airline_theme = "zenburn"
+
+" Fonts
+if has('gui_running')
+  set guioptions-=T  "remove toolbar
+  set guioptions-=r  "remove right-hand scroll bar
+  set guioptions-=L  "remove left-hand scroll bar
+  if has('gui_win32')
+    set guifont=DejaVu_Sans_Mono_for_Powerline:h10:cANSI:qDRAFT
+  else
+    set guifont=DejaVu\ Sans\ Mono\ 10
+  endif
+endif
