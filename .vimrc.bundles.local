@@ -1,4 +1,6 @@
 UnBundle 'amirh/HTML-AutoCloseTag'
-"Bundle 'davidhalter/jedi-vim'
+UnBundle 'altercation/vim-colors-solarized'
+UnBundle 'flazz/vim-colorschemes'
+Bundle 'jnurmine/Zenburn'
 Bundle 'plytophogy/vim-virtualenv'
 Bundle 'maralla/completor.vim'

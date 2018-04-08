@@ -33,4 +33,5 @@ inoremap <expr> <Tab> pumvisible() ? "<C-N>" : "<C-R>=completor#do('complete')<C
 "let g:solarized_termcolors=16
 "let g:solarized_termtrans=0
 "color solarized
-color zenburn
+colors zenburn
+let g:airline_theme = "zenburn"
