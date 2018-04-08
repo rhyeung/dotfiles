@@ -5,10 +5,6 @@ set nospell
 imap fd <Esc>
 
 " On my arm Chromebook
-if substitute(system("uname -m"), '\n', '', '') == "aarch64"
-    let g:neocomplete#enable_at_startup = 0
-endif
-
 "if substitute(system("uname -m"), '\n', '', '') == "aarch64"
   " Jedi
   "let g:jedi#auto_initialization = 1
@@ -18,13 +14,19 @@ endif
   " Neocomplete
   "let g:neocomplete#enable_at_startup = 0
   "let g:jedi#auto_initialization = 1
-  "let g:neocomplete#disable_auto_complete=1
+  "let g:neocomplete#disable_auto_complete = 1
   "inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 "endif
 
+" Disable neocomplete
+let g:neocomplete#enable_at_startup = 0
 " Turn off Neo pop up
-let g:neocomplete#disable_auto_complete=1
+let g:neocomplete#disable_auto_complete = 1
 "inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
+
+" Turn off completor auto complete by default
+let g:completor_auto_trigger = 0
+inoremap <expr> <Tab> pumvisible() ? "<C-N>" : "<C-R>=completor#do('complete')<CR>"
 
 " Look n feel
 "set background=light
