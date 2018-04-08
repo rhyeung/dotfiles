@@ -66,6 +66,7 @@ plugins=(
   git
   vi-mode
   tmux
+  virtualenvwrapper
 )
 
 
