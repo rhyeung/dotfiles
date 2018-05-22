@@ -10,7 +10,7 @@ export ZSH=$HOME/.oh-my-zsh
 if [[ "$(uname -o)" == "Cygwin" ]]; then
     ZSH_THEME="babun"
 else
-    ZSH_THEME="spaceship"
+    ZSH_THEME="robbyrussell"
 fi
 
 #if [[ "$ZSH_THEME" == "spaceship" ]]; then
