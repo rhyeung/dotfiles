@@ -24,6 +24,9 @@ let g:neocomplete#enable_at_startup = 0
 let g:neocomplete#disable_auto_complete = 1
 "inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 
+" Set pymode to python 2.7
+let g:pymode_python = 'python'
+
 " Turn off completor auto complete by default
 let g:completor_auto_trigger = 0
 inoremap <expr> <Tab> pumvisible() ? "<C-N>" : "<C-R>=completor#do('complete')<CR>"
