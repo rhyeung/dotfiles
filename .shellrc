@@ -80,7 +80,7 @@ function start_agent {
      echo succeeded
      chmod 600 "${SSH_ENV}"
      . "${SSH_ENV}" > /dev/null
-     /usr/bin/ssh-add $HOME/.ssh/id_rsa_git;
+     /usr/bin/ssh-add;
 }
 
 # Source SSH settings, if applicable
@@ -109,3 +109,8 @@ export EDITOR=`which vim`
 
 # Set vi mode
 set -o vi
+
+# Nodejs
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion"  ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

@@ -31,6 +31,10 @@ let g:pymode_python = 'python'
 let g:completor_auto_trigger = 0
 inoremap <expr> <Tab> pumvisible() ? "<C-N>" : "<C-R>=completor#do('complete')<CR>"
 
+" Auto command on file types
+"" For yapf with python
+autocmd FileType python nnoremap <leader>y :call yapf#YAPF()<cr>
+
 " Look n feel
 "set background=light
 "let g:solarized_termcolors=16

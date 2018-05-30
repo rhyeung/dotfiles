@@ -4,3 +4,4 @@ UnBundle 'flazz/vim-colorschemes'
 Bundle 'jnurmine/Zenburn'
 Bundle 'plytophogy/vim-virtualenv'
 Bundle 'maralla/completor.vim'
+Bundle 'google/yapf', { 'rtp': 'plugins/vim' }
