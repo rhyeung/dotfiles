@@ -2,7 +2,8 @@
 set nospell
 
 " Key mapping
-imap fd <Esc>
+imap kj <Esc>
+imap jk <Esc>
 
 " On my arm Chromebook
 "if substitute(system("uname -m"), '\n', '', '') == "aarch64"
