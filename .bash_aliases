@@ -11,3 +11,9 @@ alias fix='reset; stty sane; tput rs1; clear; echo -e "\033c"'
 
 ## Fix sudo root path
 #alias sudo='sudo env "PATH=$PATH"'
+
+## Neovim
+if [ -x $(which nvim) ]; then
+    alias vim='nvim'
+    alias vimdiff='nvim -d'
+fi
