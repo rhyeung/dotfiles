@@ -10,4 +10,4 @@ alias tmux='tmux -2'
 alias fix='reset; stty sane; tput rs1; clear; echo -e "\033c"'
 
 ## Fix sudo root path
-alias sudo='sudo env "PATH=$PATH"'
+#alias sudo='sudo env "PATH=$PATH"'
