@@ -29,7 +29,11 @@ function! BeforeAll()
       \ 'tpope/vim-surround',
       \ 'spf13/vim-autoclose',
       \ 'easymotion/vim-easymotion',
-      \ 'scrooloose/nerdcommenter']
+      \ 'scrooloose/nerdcommenter',
+      \ 'plytophogy/vim-virtualenv',
+      \ 'Shougo/deoplete.nvim',
+      \ 'tmhedberg/SimpylFold',
+      \ 'zchee/deoplete-jedi']
   "'joshdick/onedark.vim', 'yonchu/accelerated-smooth-scroll', 'edkolev/tmuxline.vim'
 
   " disabled plugins
@@ -49,6 +53,18 @@ function! BeforeAll()
   "let g:navim_settings.bin_dir = '/usr/local/bin'
   let g:navim_settings.cscopeprg = 'gtags-cscope'
   "let g:navim_settings.cscopeprg = 'cscope'
+  "let g:python_host_prog = '/usr/bin/python'
+  "let g:navim_settings.completion_autoselect = 0
+  "let g:navim_settings.completion_plugin = 'deoplete'
+  if $WORKON_HOME == ""
+    let g:python_host_prog=substitute(system \
+    ("which -a python2 | head -n2 | tail -n1"), "\n", '', 'g')
+    let g:python3_host_prog=substitute(system \
+    ("which -a python3 | head -n2 | tail -n1"), "\n", '', 'g')
+  else
+    let g:python_host_prog=expand($WORKON_HOME) . "/nvim-python2/bin/python"
+    let g:python3_host_prog=expand($WORKON_HOME) . "/nvim-python3/bin/python"
+  endif
 
   " plugins
   let g:navim_settings.completion_autoselect = 1
@@ -58,6 +74,15 @@ function! BeforeAll()
   let g:navim_settings.statusline_plugin = 'airline'
   "let g:navim_settings.statusline_plugin = 'lightline'
   let g:autoclose_vim_commentmode = 1
+  "let g:deoplete#enable_at_startup = 1
+
+    " python mode
+    autocmd FileType python
+      \ let g:pymode_python='python'
+
+    " SimpylFold
+    autocmd FileType python
+      \ let g:SimpylFold_docstring_preview = 1
 
   " user interface
   "let g:navim_settings.colorscheme = 'solarized'
@@ -71,13 +96,27 @@ function! BeforeAll()
   let g:navim_settings.powerline_fonts = 0
   let g:navim_settings.nerd_fonts = 1
 
+  " 
   " key mapping
 
+    " General
+      nmap <LocalLeader>f0 :set foldlevel=0<CR>
+      nmap <LocalLeader>f1 :set foldlevel=1<CR>
+      nmap <LocalLeader>f2 :set foldlevel=2<CR>
+      nmap <LocalLeader>f3 :set foldlevel=3<CR>
+      nmap <LocalLeader>f4 :set foldlevel=4<CR>
+      nmap <LocalLeader>f5 :set foldlevel=5<CR>
+      nmap <LocalLeader>f6 :set foldlevel=6<CR>
+      nmap <LocalLeader>f7 :set foldlevel=7<CR>
+      nmap <LocalLeader>f8 :set foldlevel=8<CR>
+      nmap <LocalLeader>f9 :set foldlevel=9<CR>
+
     " Python files
-      augroup myPython
+      augroup PythonFile
         au!
         autocmd FileType python
           \ nmap <buffer> <LocalLeader>r :PymodeRun<CR>
+          \| nnoremap <LocalLeader>y :0,$!yapf --style pep8<CR>
       augroup END
 
     " EasyMotionsymotion)
