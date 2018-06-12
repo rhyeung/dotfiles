@@ -33,6 +33,7 @@ function! BeforeAll()
       \ 'plytophogy/vim-virtualenv',
       \ 'Shougo/deoplete.nvim',
       \ 'tmhedberg/SimpylFold',
+      \ 'Vimjas/vim-python-pep8-indent',
       \ 'zchee/deoplete-jedi']
   "'joshdick/onedark.vim', 'yonchu/accelerated-smooth-scroll', 'edkolev/tmuxline.vim'
 
@@ -53,7 +54,6 @@ function! BeforeAll()
   "let g:navim_settings.bin_dir = '/usr/local/bin'
   let g:navim_settings.cscopeprg = 'gtags-cscope'
   "let g:navim_settings.cscopeprg = 'cscope'
-  "let g:python_host_prog = '/usr/bin/python'
   "let g:navim_settings.completion_autoselect = 0
   "let g:navim_settings.completion_plugin = 'deoplete'
   if $WORKON_HOME == ""
@@ -75,10 +75,12 @@ function! BeforeAll()
   "let g:navim_settings.statusline_plugin = 'lightline'
   let g:autoclose_vim_commentmode = 1
   "let g:deoplete#enable_at_startup = 1
+  let g:python_pep8_indent_multiline_string = -2
 
     " python mode
     autocmd FileType python
       \ let g:pymode_python='python'
+      \| let g:pymode_indent = 0
 
     " SimpylFold
     autocmd FileType python
@@ -90,7 +92,7 @@ function! BeforeAll()
   "let g:navim_settings.colorscheme = 'jellybeans'
   "let g:navim_settings.colorscheme = 'onedark'
   let g:navim_settings.colorscheme = 'zenburn'
-  let g:navim_settings.force256 = 0
+  let g:navim_settings.force256 = 1
   let g:navim_settings.termtrans = 0
   let g:navim_settings.max_column = 80
   let g:navim_settings.powerline_fonts = 0

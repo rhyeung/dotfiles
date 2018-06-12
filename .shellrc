@@ -104,7 +104,11 @@ elif [ -f "/usr/local/bin/virtualenvwrapper.sh" ]; then
 fi
 
 # Set editor to vim
-export EDITOR=`which vim`
+if [ -x $(which nvim) ]; then
+  export EDITOR=`which nvim`
+else
+  export EDITOR=`which vim`
+fi
 
 # Set vi mode
 set -o vi
