@@ -95,6 +95,10 @@ else
 fi
 
 # Setup virtualenvwrapper
+if [[ -x $(which python3) ]] && [[ ! -x $(which python2) ]]; then
+    export VIRTUALENVWRAPPER_PYTHON=$(which python3)
+fi
+
 if [ -f "/usr/share/virtualenvwrapper/virtualenvwrapper.sh" ]; then
     source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 elif [ -f "/usr/bin/virtualenvwrapper.sh" ]; then
@@ -104,7 +108,7 @@ elif [ -f "/usr/local/bin/virtualenvwrapper.sh" ]; then
 fi
 
 # Set editor to vim
-if [ -x $(which nvim) ]; then
+if [[ -x $(which nvim) ]]; then
   export EDITOR=`which nvim`
 else
   export EDITOR=`which vim`
@@ -117,3 +121,7 @@ set -o vi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion"  ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# tabtab source for serverless package
+# uninstall by removing these lines or running `tabtab uninstall serverless`
+[[ -f $HOME/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh ]] && . $HOME/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh
