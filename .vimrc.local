@@ -1,0 +1,57 @@
+" Global
+set nospell
+
+" Key mapping
+imap kj <Esc>
+imap jk <Esc>
+
+" On my arm Chromebook
+"if substitute(system("uname -m"), '\n', '', '') == "aarch64"
+  " Jedi
+  "let g:jedi#auto_initialization = 1
+  "let g:jedi#popup_on_dot = 0
+  "let g:neocomplete#enable_at_startup = 0
+"else
+  " Neocomplete
+  "let g:neocomplete#enable_at_startup = 0
+  "let g:jedi#auto_initialization = 1
+  "let g:neocomplete#disable_auto_complete = 1
+  "inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
+"endif
+
+" Disable neocomplete
+let g:neocomplete#enable_at_startup = 0
+" Turn off Neo pop up
+let g:neocomplete#disable_auto_complete = 1
+"inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
+
+" Set pymode to python 2.7
+let g:pymode_python = 'python'
+
+" Turn off completor auto complete by default
+let g:completor_auto_trigger = 0
+inoremap <expr> <Tab> pumvisible() ? "<C-N>" : "<C-R>=completor#do('complete')<CR>"
+
+" Auto command on file types
+"" For yapf with python
+autocmd FileType python nnoremap <leader>y :call yapf#YAPF()<cr>
+
+" Look n feel
+"set background=light
+"let g:solarized_termcolors=16
+"let g:solarized_termtrans=0
+"color solarized
+colors zenburn
+let g:airline_theme = "zenburn"
+
+" Fonts
+if has('gui_running')
+  set guioptions-=T  "remove toolbar
+  set guioptions-=r  "remove right-hand scroll bar
+  set guioptions-=L  "remove left-hand scroll bar
+  if has('gui_win32')
+    set guifont=DejaVu_Sans_Mono_for_Powerline:h10:cANSI:qDRAFT
+  else
+    set guifont=DejaVu\ Sans\ Mono\ 10
+  endif
+endif
