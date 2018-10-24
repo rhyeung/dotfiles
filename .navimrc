@@ -79,7 +79,7 @@ function! BeforeAll()
 
     " python mode
     autocmd FileType python
-      \ let g:pymode_python='python'
+      \ let g:pymode_python='python3'
       \| let g:pymode_indent = 0
 
     " SimpylFold
@@ -121,12 +121,22 @@ function! BeforeAll()
           \| nnoremap <LocalLeader>y :0,$!yapf --style pep8<CR>
       augroup END
 
-    " EasyMotionsymotion)
+    " JSON files
+      augroup JsonFile
+        au!
+        autocmd FileType json
+          \ nmap <LocalLeader>jt :%!python -m json.tool<CR><Esc>:set filetype=json<CR>
+        augroup END
+
+    " EasyMotionsymotion
       nmap <LocalLeader><LocalLeader> <Plug>(easymotion-prefix)
 
     " NERD Commenter
       nmap <LocalLeader>c<space> :call NERDComment(0,"toggle")<CR>
       vmap <LocalLeader>c<space> :call NERDComment(0,"toggle")<CR>
+
+    " Undotree
+      nmap <LocalLeader>u :UndotreeToggle<CR>
 
 endfunction
 
