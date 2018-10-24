@@ -7,13 +7,11 @@ export ZSH=$HOME/.oh-my-zsh
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-#if [[ "$(uname -o)" == "Cygwin" ]]; then
-    #ZSH_THEME="babun"
-#else
-    #ZSH_THEME="robbyrussell"
-#fi
-
-ZSH_THEME="robbyrussell"
+if [[ "$(uname -o)" == "Cygwin" ]]; then
+    ZSH_THEME="babun"
+else
+    ZSH_THEME="robbyrussell"
+fi
 
 # Set list of themes to load
 # Setting this variable when ZSH_THEME=random
@@ -126,7 +124,3 @@ export NVM_DIR="$HOME/.nvm"
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
 [[ -f /home/z/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh ]] && . /home/z/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh
-
-# tabtab source for sls package
-# uninstall by removing these lines or running `tabtab uninstall sls`
-[[ -f /home/z/.nvm/versions/node/v10.5.0/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.zsh ]] && . /home/z/.nvm/versions/node/v10.5.0/lib/node_modules/serverless/node_modules/tabtab/.completions/sls.zsh

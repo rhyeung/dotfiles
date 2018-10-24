@@ -28,12 +28,12 @@ esac
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
     else
-	color_prompt=
+        color_prompt=
     fi
 fi
 
@@ -95,6 +95,10 @@ else
 fi
 
 # Setup virtualenvwrapper
+if [[ -x $(which python3) ]] && [[ ! -x $(which python2) ]]; then
+    export VIRTUALENVWRAPPER_PYTHON=$(which python3)
+fi
+
 if [ -f "/usr/share/virtualenvwrapper/virtualenvwrapper.sh" ]; then
     source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 elif [ -f "/usr/bin/virtualenvwrapper.sh" ]; then
@@ -104,7 +108,7 @@ elif [ -f "/usr/local/bin/virtualenvwrapper.sh" ]; then
 fi
 
 # Set editor to vim
-if [ -x $(which nvim) ]; then
+if [[ -x $(which nvim) ]]; then
   export EDITOR=`which nvim`
 else
   export EDITOR=`which vim`
@@ -122,3 +126,7 @@ export NVM_DIR="$HOME/.nvm"
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+
+# tabtab source for serverless package
+# uninstall by removing these lines or running `tabtab uninstall serverless`
+[[ -f $HOME/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh ]] && . $HOME/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh
