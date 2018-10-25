@@ -424,8 +424,15 @@ vno <right> <Nop>
 vno <up> <Nop>
 
 python3 << EOF
+import os
+import sys
 import vim
+
+workon_home = os.environ['WORKON_HOME']
+sys.path.append(workon_home + '/vim-python3/lib/python3.6/site-packages')
+
 import git
+
 def is_git_repo():
 	try:
 		_ = git.Repo('.', search_parent_directories=True).git_dir
