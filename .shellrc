@@ -97,17 +97,17 @@ else
 fi
 
 # Setup virtualenvwrapper
-if [[ -x $(which python3) ]] && [[ ! -x $(which python2) ]]; then
-    export VIRTUALENVWRAPPER_PYTHON=$(which python3)
-fi
-
-if [ -f "/usr/share/virtualenvwrapper/virtualenvwrapper.sh" ]; then
-    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-elif [ -f "/usr/bin/virtualenvwrapper.sh" ]; then
-	source /usr/bin/virtualenvwrapper.sh
-elif [ -f "/usr/local/bin/virtualenvwrapper.sh" ]; then
-	source /usr/local/bin/virtualenvwrapper.sh
-fi
+# if [[ -x $(which python3) ]] && [[ ! -x $(which python2) ]]; then
+#     export VIRTUALENVWRAPPER_PYTHON=$(which python3)
+# fi
+#
+# if [ -f "/usr/share/virtualenvwrapper/virtualenvwrapper.sh" ]; then
+#     source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+# elif [ -f "/usr/bin/virtualenvwrapper.sh" ]; then
+#     source /usr/bin/virtualenvwrapper.sh
+# elif [ -f "/usr/local/bin/virtualenvwrapper.sh" ]; then
+#     source /usr/local/bin/virtualenvwrapper.sh
+# fi
 
 # Set editor to vim
 if [[ -x $(which nvim) ]]; then
@@ -119,15 +119,16 @@ fi
 # Set vi mode
 set -o vi
 
-# Nodejs
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion"  ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 #pyenv
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+# export PYENV_VIRTUALENV_DISABLE_PROMPT=0
+
+# Nodejs
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion"  ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
