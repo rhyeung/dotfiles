@@ -305,7 +305,7 @@ au Syntax * RainbowParenthesesLoadBraces
 "=====================================================
 "" Autopep8 settings
 "=====================================================
-let g:autopep8_cmd=expand($WORKON_HOME) . "/vim-python3/bin/autopep8"
+let g:autopep8_cmd=expand($PYENV_ROOT) . '/versions' . '/vim-python3/bin/autopep8'
 let g:autopep8_disable_show_diff=1
 autocmd FileType python noremap <leader>f :call Autopep8()<CR>
 
@@ -320,12 +320,12 @@ set listchars=tab:›\ ,trail:•,extends:#,nbsp:.
 " python executables for different plugins
 let g:pymode_python='python3'
 "let g:python3_host_prog='/usr/bin/python3'
-if $WORKON_HOME == ""
+if $PYENV_ROOT == ""
   let g:python_host_prog=substitute(system("which -a python2 | head -n2 | tail -n1"), "\n", '', 'g')
   let g:python3_host_prog=substitute(system("which -a python3 | head -n2 | tail -n1"), "\n", '', 'g')
 else
-  "let g:python_host_prog=expand($WORKON_HOME) . "/nvim-python2/bin/python"
-  let g:python3_host_prog=expand($WORKON_HOME) . "/vim-python3/bin/python"
+  " let g:python_host_prog=expand($PYENV_ROOT) . '/versions' . '/vim-python2/bin/python'
+  let g:python3_host_prog=expand($PYENV_ROOT) . '/versions' . '/vim-python3/bin/python3'
 endif
 
 " rope
@@ -393,9 +393,9 @@ let g:pymode_run_bind='<F5>'
 
 let g:ale_fix_on_save = 1
 let g:ale_fixers = {'python': ['yapf', 'autopep8']}
-" let g:ale_python_flake8_executable = expand($WORKON_HOME) . "/vim-python3/bin/python3"
+" let g:ale_python_flake8_executable = expand($PYENV_ROOT) . '/versions' . '/vim-python3/bin/python3'
 " let g:ale_python_flake8_options = '-m flake8'
-let g:ale_python_autopep8_executable = expand($WORKON_HOME) . "/vim-python3/bin/autopep8"
+let g:ale_python_autopep8_executable = expand($PYENV_ROOT) . '/versions' . '/vim-python3/bin/autopep8'
 let g:ale_sign_column_always = 0
 let g:ale_emit_conflict_warnings = 0
 let g:airline#extensions#ale#enabled = 1
@@ -429,8 +429,8 @@ import os
 import sys
 import vim
 
-workon_home = os.environ['WORKON_HOME']
-sys.path.append(workon_home + '/vim-python3/lib/python3.6/site-packages')
+py_git_lib = os.environ['PY_GIT_LIB']
+sys.path.append(py_git_lib)
 
 import git
 

@@ -123,6 +123,10 @@ set -o vi
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+PYENV_ROOT=$(pyenv root)
+# PYENV_VIM3=$(pyenv virtualenvs | grep ^" *vim-python3" | sed 's/.*versions\/\(.*\))/\1/')
+PY_GIT_LIB=$(find $PYENV_ROOT/versions/vim-python3/ -type d -name site-packages)
+export PYENV_ROOT PY_GIT_LIB
 # export PYENV_VIRTUALENV_DISABLE_PROMPT=0
 
 # Nodejs
