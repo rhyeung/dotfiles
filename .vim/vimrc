@@ -73,6 +73,7 @@ Plugin 'kien/rainbow_parentheses.vim'       " Rainbow Parentheses
 Plugin 'chriskempson/base16-vim'            " Base 16 colors
 Plugin 'ryanoasis/vim-devicons'             " Dev Icons
 Plugin 'mbbill/undotree'                    " Undo history
+Plugin 'cj/vim-webdevicons'                 " Add font icons glyphs
 
 "-------------------=== Snippets support ===--------------------
 Plugin 'garbas/vim-snipmate'                " Snippets manager
@@ -108,7 +109,7 @@ endif
 set encoding=utf-8
 let base16colorspace=256
 set t_Co=256                                " 256 colors
-set guifont=mononoki\ Nerd\ Font\ 18
+set guifont=Droid\ Sans\ Mono\ Nerd\ Font\ Complete\ 11
 colorscheme zenburn             " set vim colorscheme
 let g:airline_theme='zenburn'             " set airline theme
 syntax enable                               " enable syntax highlighting
@@ -421,8 +422,8 @@ let g:autoclose_vim_commentmode = 1
 
 " key binding
 let g:mapleader = ','
+imap fd <Esc>
 imap kj <Esc>
-imap jk <Esc>
 imap <F5> <Esc>:w<CR>:!clear;python %<CR>
 
 no <down> <Nop>
