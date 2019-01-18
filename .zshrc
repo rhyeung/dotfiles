@@ -117,3 +117,4 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 if [ -f $HOME/.shellrc ]; then
   source $HOME/.shellrc
 fi
+
