@@ -10,7 +10,7 @@ export ZSH=$HOME/.oh-my-zsh
 if [[ "$(uname -o)" == "Cygwin" ]]; then
     ZSH_THEME="babun"
 else
-    ZSH_THEME="robbyrussell"
+    ZSH_THEME="af-magic"
 fi
 
 # Set list of themes to load
