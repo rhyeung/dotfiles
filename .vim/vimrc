@@ -54,15 +54,15 @@ Plugin 'fisadev/FixedTaskList.vim'          " Pending tasks list
 Plugin 'yuttie/comfortable-motion.vim'      " Smooth scrolling
 Plugin 'MattesGroeger/vim-bookmarks'        " Bookmarks
 Plugin 'thaerkh/vim-indentguides'           " Visual representation of indents
-Plugin 'neomake/neomake'                    " Asynchronous Linting and Make Framework
-Plugin 'Shougo/deoplete.nvim'               " Asynchronous Completion
-Plugin 'zchee/deoplete-jedi'                " Jedi for deoplete
-Plugin 'roxma/nvim-yarp'                    " Deoplete Dependency #1
-Plugin 'roxma/vim-hug-neovim-rpc'           " Deoplete Dependency #2
+" Plugin 'neomake/neomake'                    " Asynchronous Linting and Make Framework
+" Plugin 'Shougo/deoplete.nvim'               " Asynchronous Completion
+" Plugin 'zchee/deoplete-jedi'                " Jedi for deoplete
+" Plugin 'roxma/nvim-yarp'                    " Deoplete Dependency #1
+" Plugin 'roxma/vim-hug-neovim-rpc'           " Deoplete Dependency #2
 Plugin 'easymotion/vim-easymotion'          " Get around document easily
 Plugin 'spf13/vim-autoclose'                " Auto close brackets
-Plugin 'tpope/vim-fugitive'                 " Git wrapper
-Plugin 'tell-k/vim-autopep8'                " PEP8 formatter
+" Plugin 'tpope/vim-fugitive'                 " Git wrapper
+" Plugin 'tell-k/vim-autopep8'                " PEP8 formatter
 
 "-------------------=== Other ===-------------------------------
 Plugin 'tpope/vim-surround'                 " Parentheses, brackets, quotes, XML tags, and more
@@ -87,12 +87,12 @@ Plugin 'mitsuhiko/vim-sparkup'              " Sparkup(XML/jinja/htlm-django/etc.
 Plugin 'w0rp/ale'
 
 "-------------------=== Python  ===-----------------------------
-Plugin 'klen/python-mode'                   " Python mode (docs, refactor, lints...)
-Plugin 'hynek/vim-python-pep8-indent'
-Plugin 'mitsuhiko/vim-python-combined'
-Plugin 'mitsuhiko/vim-jinja'
-" Plugin 'jmcantrell/vim-virtualenv'
-Plugin 'lambdalisue/vim-pyenv'
+" Plugin 'klen/python-mode'                   " Python mode (docs, refactor, lints...)
+" Plugin 'hynek/vim-python-pep8-indent'
+" Plugin 'mitsuhiko/vim-python-combined'
+" Plugin 'mitsuhiko/vim-jinja'
+" " Plugin 'jmcantrell/vim-virtualenv'
+" Plugin 'lambdalisue/vim-pyenv'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -163,8 +163,8 @@ nmap <silent> <leader>q :SyntasticCheck # <CR> :bp <BAR> bd #<CR>
 "=====================================================
 "" Neomake Settings 
 "=====================================================
-call neomake#configure#automake('w')
-let g:neomake_open_list = 2
+" call neomake#configure#automake('w')
+" let g:neomake_open_list = 2
 
 "=====================================================
 "" Deoplete  Settings 
