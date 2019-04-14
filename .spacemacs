@@ -144,8 +144,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro for Powerline"
-                               :size 19
+   dotspacemacs-default-font '("SauceCodePro Nerd Font Mono"
+                               :size 17
                                :slant normal
                                :weight normal
                                :width normal
@@ -324,6 +324,7 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   (setq exec-path (cons "/home/z/.pyenv/versions/vim-python3/bin" exec-path))
+  (setq exec-path (cons "/home/z/.nvm/versions/node/v11.13.0/bin" exec-path))
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
