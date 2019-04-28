@@ -1,5 +1,17 @@
 # To manage and sync my dotfiles
 
+## Use dwiw vim distro
+https://github.com/mkropat/vim-dwiw2015
+
+```
+curl -sS https://raw.githubusercontent.com/mkropat/vim-dwiw2015/master/bootstrap.sh | sh
+```
+
+Install silversearcher-ag
+```
+sudo apt-get install silversearcher-ag
+```
+
 ## Use spf13 to manage vim
 https://github.com/spf13/spf13-vim
 
