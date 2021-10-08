@@ -1,7 +1,7 @@
 # Common rc file for all shells
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
-export PATH=$HOME/bin:$PATH
+export PATH=$PATH:$HOME/bin:$HOME/.pulumi/bin
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -73,29 +73,29 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# Setup ssh-agent
-SSH_ENV="$HOME/.ssh/environment"
-
-# SSH key agent
-function start_agent {
-     echo "Initialising new SSH agent..."
-     /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-     echo succeeded
-     chmod 600 "${SSH_ENV}"
-     . "${SSH_ENV}" > /dev/null
-     /usr/bin/ssh-add;
-}
-
-# Source SSH settings, if applicable
-if [ -f "${SSH_ENV}" ]; then
-     . "${SSH_ENV}" > /dev/null
-     #ps ${SSH_AGENT_PID} doesn't work under cywgin
-     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-         start_agent;
-     }
-else
-     start_agent;
-fi
+## Setup ssh-agent
+#SSH_ENV="$HOME/.ssh/environment"
+#
+## SSH key agent
+#function start_agent {
+#     echo "Initialising new SSH agent..."
+#     /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+#     echo succeeded
+#     chmod 600 "${SSH_ENV}"
+#     . "${SSH_ENV}" > /dev/null
+#     /usr/bin/ssh-add;
+#}
+#
+## Source SSH settings, if applicable
+#if [ -f "${SSH_ENV}" ]; then
+#     . "${SSH_ENV}" > /dev/null
+#     #ps ${SSH_AGENT_PID} doesn't work under cywgin
+#     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+#         start_agent;
+#     }
+#else
+#     start_agent;
+#fi
 
 # Setup virtualenvwrapper
 # if [[ -x $(which python3) ]] && [[ ! -x $(which python2) ]]; then
@@ -120,15 +120,14 @@ fi
 # Set vi mode
 set -o vi
 
-#pyenv
+##pyenv
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
-PYENV_ROOT=$(pyenv root)
-# PYENV_VIM3=$(pyenv virtualenvs | grep ^" *vim-python3" | sed 's/.*versions\/\(.*\))/\1/')
-PY_GIT_LIB=$(find $PYENV_ROOT/versions/vim-python3/ -type d -name site-packages)
-export PYENV_ROOT PY_GIT_LIB
-# export PYENV_VIRTUALENV_DISABLE_PROMPT=0
+export PATH=$(pyenv root)/shims:$PATH
+#PYENV_ROOT=$(pyenv root)
+## PY_GIT_LIB=$(find $PYENV_ROOT/versions/vim-python3/ -type d -name site-packages)
+#export PYENV_ROOT #PY_GIT_LIB
 
 # Nodejs
 export NVM_DIR="$HOME/.nvm"
@@ -137,11 +136,11 @@ export NVM_DIR="$HOME/.nvm"
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
-[[ -f $HOME/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh ]] && . $HOME/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh
+# [[ -f $HOME/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh ]] && . $HOME/.nvm/versions/node/v10.1.0/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.zsh
 
 # Perl CPAN
-PATH="/home/z/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="/home/z/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="/home/z/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"/home/z/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/home/z/perl5"; export PERL_MM_OPT;
+# PATH="/home/z/perl5/bin${PATH:+:${PATH}}"; export PATH;
+# PERL5LIB="/home/z/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+# PERL_LOCAL_LIB_ROOT="/home/z/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+# PERL_MB_OPT="--install_base \"/home/z/perl5\""; export PERL_MB_OPT;
+# PERL_MM_OPT="INSTALL_BASE=/home/z/perl5"; export PERL_MM_OPT;

@@ -8,5 +8,6 @@ source ~/.vim/dwiw-loader.vim
 " set expandtab
 let mapleader = ","
 imap fd <esc>
+imap jk <esc>
 
 Plugin 'easymotion/vim-easymotion'

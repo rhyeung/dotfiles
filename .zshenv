@@ -1,1 +1,1 @@
-.shellrc
+/home/z/.zprezto/runcoms/zshenv
