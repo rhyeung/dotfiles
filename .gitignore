@@ -1,7 +1,0 @@
-#Patterns to ignore
-.vim.simple/bundle/*
-.vim.simple/bundle/Vundle.vim/.git
-README.md
-
-#Patterns not ignored
-!.vim.simple/bundle/Vundle.vim
