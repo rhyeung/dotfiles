@@ -129,3 +129,5 @@ fi
 if [ -f $HOME/.shellrc ]; then
       source $HOME/.shellrc
 fi
+
+eval "$(direnv hook bash)"

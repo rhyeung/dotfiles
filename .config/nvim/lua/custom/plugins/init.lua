@@ -9,6 +9,7 @@ return {
   'nvim-telescope/telescope-project.nvim',
   'dense-analysis/ale',
   'jonpas/vim-sqflint-ale',
+  'direnv/direnv.vim',
   {
     'smoka7/hop.nvim',
     version = '*',

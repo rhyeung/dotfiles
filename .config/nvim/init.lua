@@ -926,6 +926,7 @@ o.expandtab = true -- expand tab input with spaces characters
 o.smartindent = true -- syntax aware indentations for newline inserts
 o.tabstop = 4 -- num of space characters per tab
 o.shiftwidth = 4 -- spaces per indentation level
+vim.g.python3_host_prog = '/usr/bin/python3'
 
 local keymap = vim.keymap
 keymap.set('i', 'kj', '<Esc>', { noremap = true, silent = true, desc = 'which_key_ignore' })
