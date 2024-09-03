@@ -32,3 +32,9 @@ if [ -f "${SSH_ENV}" ]; then
 else
      start_agent;
 fi
+
+# make the nerdfont available to the chromebook terminal
+FONT_SRV="${HOME}/bin/font-server.py"
+if [ -x "${FONT_SRV}" ]; then
+  (cd ${HOME}/.local/share/fonts; nohup "${FONT_SRV}" 127.0.0.1 8100 > /dev/null 2> /dev/null & )
+fi

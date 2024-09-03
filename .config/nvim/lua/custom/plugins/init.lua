@@ -10,6 +10,7 @@ return {
   'dense-analysis/ale',
   'jonpas/vim-sqflint-ale',
   'direnv/direnv.vim',
+  'nvim-telekasten/calendar-vim',
   {
     'smoka7/hop.nvim',
     version = '*',
@@ -30,6 +31,11 @@ return {
     config = true,
     -- use opts = {} for passing setup options
     -- this is equalent to setup({}) function
+  },
+  {
+    'renerocksai/telekasten.nvim',
+    lazy = true,
+    dependencies = {'nvim-telescope/telescope.nvim'}
   },
   {
     "swaits/scratch.nvim",
