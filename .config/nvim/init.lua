@@ -90,8 +90,8 @@ vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 30
 
 -- See :help netrw-browse-maps
-vim.keymap.set('n', '<leader>e', '<cmd>Lexplore<cr>', {desc = 'Toggle file explorer'})
-vim.keymap.set('n', '<leader>E', '<cmd>Lexplore %:p:h<cr>', {desc = 'Open file explorer in current file'})
+--vim.keymap.set('n', '<leader>e', '<cmd>Lexplore<cr>', {desc = 'Toggle file explorer'})
+--vim.keymap.set('n', '<leader>E', '<cmd>Lexplore %:p:h<cr>', {desc = 'Open file explorer in current file'})
 
 -- See :help lualine.txt
 require('lualine').setup({
@@ -116,8 +116,9 @@ require('which-key').setup({
 })
 
 require('which-key').add({
-  {'<leader>f', group = 'Fuzzy Find'},
-  {'<leader>b', group = 'Buffer'},
+  {'<leader>s', group = '[S]earch'},
+  {'<leader>b', group = '[B]uffer'},
+  {'<leader>c', group = '[C]alendar'},
 })
 
 -- See :help MiniAi-textobject-builtin
@@ -144,14 +145,33 @@ vim.notify = require('mini.notify').make_notify({})
 vim.keymap.set('n', '<leader>bc', '<cmd>lua pcall(MiniBufremove.delete)<cr>', {desc = 'Close buffer'})
 
 -- See :help telescope.builtin
-vim.keymap.set('n', '<leader>?', '<cmd>Telescope oldfiles<cr>', {desc = 'Search file history'})
-vim.keymap.set('n', '<leader><space>', '<cmd>Telescope buffers<cr>', {desc = 'Search open files'})
-vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<cr>', {desc = 'Search all files'})
-vim.keymap.set('n', '<leader>fg', '<cmd>Telescope live_grep<cr>', {desc = 'Search in project'})
-vim.keymap.set('n', '<leader>fd', '<cmd>Telescope diagnostics<cr>', {desc = 'Search diagnostics'})
-vim.keymap.set('n', '<leader>fs', '<cmd>Telescope current_buffer_fuzzy_find<cr>', {desc = 'Buffer local search'})
-
 require('telescope').load_extension('zf-native')
+
+local builtin = require 'telescope.builtin'
+vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
+vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+
+-- It's also possible to pass additional configuration options.
+--  See `:help telescope.builtin.live_grep()` for information about particular keys
+vim.keymap.set('n', '<leader>s/', function()
+  builtin.live_grep {
+    grep_open_files = true,
+    prompt_title = 'Live Grep in Open Files',
+  }
+end, { desc = '[S]earch [/] in Open Files' })
+
+-- Shortcut for searching your Neovim configuration files
+vim.keymap.set('n', '<leader>sn', function()
+  builtin.find_files { cwd = vim.fn.stdpath 'config' }
+end, { desc = '[S]earch [N]eovim files' })
 
 local cmp = require('cmp')
 
@@ -262,7 +282,6 @@ wk.add({
   { '<leader>ng', '<cmd>Neotree float git_status<cr>', desc = '[N]eotree [G]it Status', remap = false },
   { '<leader>p', '<cmd>lua require"telescope".extensions.project.project{}<cr>', desc = '[P]roject' },
   { '<leader>u', '<cmd>UndotreeToggle<cr>', desc = '[U]ndo' },
-  { '<leader>b', group = 'Sratch [B]uffer' },
   { '<leader>bs', '<cmd>Scratch<cr>', desc = '[s]cratch Buffer' },
   { '<leader>bS', '<cmd>ScratchSplit<cr>', desc = 'Scratch Buffer [S]plit' },
   { '<leader>t', group = '[T]elekasten' },
