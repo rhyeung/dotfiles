@@ -7,9 +7,10 @@ source ~/.vim/dwiw-loader.vim
 " On pressing tab, insert 4 spaces
 " set expandtab
 let mapleader = ","
+imap jk <esc>
 imap kj <esc>
-imap fd <esc>
 
 Plugin 'easymotion/vim-easymotion'
 
 let g:airline_powerline_fonts=1
+set relativenumber

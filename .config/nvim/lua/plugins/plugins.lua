@@ -3,14 +3,15 @@
 --
 -- See the kickstart.nvim README for more information
 return {
-  'sqwishy/vim-sqf-syntax',
   'mbbill/undotree',
   'tpope/vim-fugitive',
   'nvim-telescope/telescope-project.nvim',
   'dense-analysis/ale',
   'jonpas/vim-sqflint-ale',
+  'sqwishy/vim-sqf-syntax',
   'direnv/direnv.vim',
   'nvim-telekasten/calendar-vim',
+  'lewis6991/gitsigns.nvim',
   {
     'smoka7/hop.nvim',
     version = '*',
