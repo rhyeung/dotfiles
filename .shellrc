@@ -38,3 +38,8 @@ FONT_SRV="${HOME}/bin/font-server.py"
 if [ -x "${FONT_SRV}" ]; then
   (cd ${HOME}/.local/share/fonts; nohup "${FONT_SRV}" 127.0.0.1 8100 > /dev/null 2> /dev/null & )
 fi
+
+# esp open sdk
+if [ -d "/opt/xtensa-lx106-elf/bin" ]; then
+  export PATH=$PATH:/opt/xtensa-lx106-elf/bin
+fi

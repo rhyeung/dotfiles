@@ -319,8 +319,11 @@ require'lspconfig'.basedpyright.setup{}
 vim.g.ale_fixers = {
   ['python'] = { "black", "isort", "autoflake" },
   ['cpp'] = { "clang-format" },
+  ['c'] = { "astyle" },
 }
 vim.g.ale_echo_msg_format = '%linter% says %code%: %s'
+vim.g.ale_c_astyle_executable = 'astyle --style=kr'
+vim.g.ale_c_astyle_project_options = '.astylrc'
 vim.g.ale_python_auto_poetry = 1
 vim.g.ale_python_autoflake_auto_poetry = 1
 vim.g.ale_python_flake8_auto_poetry = 1
