@@ -319,7 +319,7 @@ require'lspconfig'.basedpyright.setup{}
 vim.g.ale_fixers = {
   ['python'] = { "black", "isort", "autoflake" },
   ['cpp'] = { "clang-format" },
-  ['c'] = { "astyle" },
+  ['c'] = { "astyle", "clang-format" },
 }
 vim.g.ale_echo_msg_format = '%linter% says %code%: %s'
 vim.g.ale_c_astyle_executable = 'astyle --style=kr'
