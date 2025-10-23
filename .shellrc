@@ -1,6 +1,9 @@
 ## DEFAULT
 set -o vi
+
 #export PATH="$HOME/bin:$PATH"
+## GO
+export PATH="/usr/local/go/bin:$PATH"
 
 ## PYTHON
 export PATH="$HOME/.pyenv/bin:$PATH"
@@ -40,6 +43,6 @@ if [ -x "${FONT_SRV}" ]; then
 fi
 
 # esp open sdk
-if [ -d "/opt/xtensa-lx106-elf/bin" ]; then
-  export PATH=$PATH:/opt/xtensa-lx106-elf/bin
-fi
+#if [ -d "/opt/xtensa-lx106-elf/bin" ]; then
+#  export PATH=$PATH:/opt/xtensa-lx106-elf/bin
+#fi
