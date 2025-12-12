@@ -7,7 +7,7 @@ source ~/.vim/dwiw-loader.vim
 " On pressing tab, insert 4 spaces
 " set expandtab
 let mapleader = ","
-imap ii <esc>
+imap jk <esc>
 
 Plugin 'easymotion/vim-easymotion'
 Plugin 'arcticicestudio/nord-vim'
