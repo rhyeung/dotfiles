@@ -3,12 +3,12 @@ set -o vi
 
 #export PATH="$HOME/bin:$PATH"
 ## GO
-export PATH="/usr/local/go/bin:$PATH"
+export PATH="/usr/local/go/bin:/Users/ray/.cargo/bin:$PATH"
 
-## Pyenv
+# Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - bash)"
+eval "$(pyenv init - zsh)"
 eval "$(pyenv virtualenv-init -)"
 
 ## SSH AGENT
@@ -49,3 +49,56 @@ fi
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# >>> talisman >>>
+# Below environment variables should not be modified unless you know what you are doing
+export TALISMAN_HOME=/Users/ray/.talisman/bin
+alias talisman=$TALISMAN_HOME/talisman_darwin_arm64
+export TALISMAN_INTERACTIVE=false
+# # <<< talisman <<<
+#
+# local functions
+azval() {
+  # --- Defaults ---
+  local org="EACustomerManagement"
+  local project=$(basename "$PWD")
+  local branch="refs/heads/$(git rev-parse --abbrev-ref HEAD)"
+  local pipeline_id=""
+
+  # --- Parse Named Arguments ---
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --org) org="$2"; shift 2 ;;
+      --project) project="$2"; shift 2 ;;
+      --id) pipeline_id="$2"; shift 2 ;;
+      *) echo "Unknown option: $1"; return 1 ;;
+    esac
+  done
+
+  # --- Build the CLI Arguments ---
+  # These are passed to the tool inside the container
+  local tool_args=(
+    --organisation "$org"
+    --project "$project"
+    --branch "$branch"
+  )
+
+  if [[ -n "$pipeline_id" ]]; then
+    tool_args+=(--pipeline-id "$pipeline_id")
+  fi
+
+  # --- Execution ---
+  echo "------------------------------------------------"
+  echo "Org:     $org"
+  echo "Project: $project"
+  echo "Branch:  $branch"
+  [[ -n "$pipeline_id" ]] && echo "ID:      $pipeline_id"
+  echo "------------------------------------------------"
+
+  # We still need the PAT as an Env Var, but Org/Project move to tool_args
+  docker run --rm \
+    --platform linux/amd64 \
+    -e ACCESS_TOKEN="$ADO_PAT" \
+    sietsetro/azdidate:0.1.0 \
+    "${tool_args[@]}"
+}
