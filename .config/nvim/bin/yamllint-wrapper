@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Ensure the exit code of the pipe is the exit code of yamllint, not sed
+set -o pipefail
+
+# 1. Path to the real Mason binary
+REAL_YAMLLINT="$HOME/.local/share/nvim/mason/bin/yamllint"
+
+# 2. Hard-extract the filename from the arguments sent by null-ls
+# We specifically look for the value that follows '--file-name'
+ORIGINAL_PATH=""
+for ((i=1; i<=$#; i++)); do
+    if [[ "${!i}" == "--file-name" ]]; then
+        j=$((i+1))
+        ORIGINAL_PATH="${!j}"
+        break
+    fi
+done
+
+# 3. Early exit for your pipelines (Silent for AzDO)
+if [[ "$ORIGINAL_PATH" == *"azure-pipelines"* ]]; then
+    exit 0
+fi
+
+# 4. Handle the live buffer content
+# Capture Neovim's stdin into a fixed temp file name
+TEMP_FILE="/tmp/nvim_yamllint_buffer.yml"
+cat > "$TEMP_FILE"
+
+# 5. Execute with the ONLY order yamllint accepts:
+# binary [FLAGS] [FILE_TO_LINT]
+if [[ -n "$ORIGINAL_PATH" ]]; then
+    # Filter the output so /tmp/nvim_yamllint_buffer.yml appears as the actual file path
+    "$REAL_YAMLLINT" --format parsable "$TEMP_FILE" | sed "s|$TEMP_FILE|$ORIGINAL_PATH|g"
+else
+    "$REAL_YAMLLINT" --format parsable "$TEMP_FILE"
+fi
+
+# 6. Final cleanup
+ret=$?
+rm -f "$TEMP_FILE"
+exit $ret

@@ -48,25 +48,27 @@ return {
     config = {
       -- Yaml LSP
       yamlls = {
+        on_new_config = function(config)
+          -- Force the standard SchemaStore list into the config
+          config.settings.yaml.schemas = require("schemastore").yaml.schemas()
+        end,
         settings = {
           yaml = {
-            schemas = {
-              -- ["https://raw.githubusercontent.com/microsoft/azure-pipelines-vscode/main/service-schema.json"] = {
-              [azdo_custmgmt_schema] = {
-                "azure-pipelines.yml",
-                "*.azure-pipelines.yml",
-                "**/azure-pipelines/**/*.yml",
-                "**/pipelines/**/*.yml",
-                ".azdo/**/*.yml",
-                ".azdo/**/*.yaml",
-                "**/.azdo/**/*.yml",
-              },
-            },
+            schemaStore = { enable = false, url = "" },
             validate = true,
             hover = true,
             completion = true,
           },
         },
+      },
+      terraformls = {
+        init_options = {
+          terraform = {
+            path = "/opt/homebrew/bin/terraform",
+          },
+        },
+        -- Optional: ensure the server triggers on the right files
+        filetypes = { "terraform", "terraform-vars", "hcl" },
       },
       -- clangd = { capabilities = { offsetEncoding = "utf-8" } },
     },
