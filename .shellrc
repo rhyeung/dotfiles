@@ -59,3 +59,12 @@ export TALISMAN_INTERACTIVE=false
 #
 # Delta
 export DELTA_FEATURES="diff-so-fancy"
+
+# fzf
+# Keep the fast file finding, but remove the extra UI clutter
+export FZF_DEFAULT_COMMAND="rg --files --follow --hidden --glob '!.git'"
+# Stripped down: No borders, no custom binds, no reverse layout
+export FZF_DEFAULT_OPTS="--ansi --info=inline-right --layout=reverse --border=none \
+--bind 'ctrl-j:down,ctrl-k:up,ctrl-u:preview-page-up,ctrl-d:preview-page-down'"
+# Simple preview without the 100% height or complex paging
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always {}'"

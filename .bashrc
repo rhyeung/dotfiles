@@ -143,3 +143,5 @@ export TALISMAN_HOME=/Users/ray/.talisman/bin
 alias talisman=$TALISMAN_HOME/talisman_darwin_arm64
 export TALISMAN_INTERACTIVE=false
 # <<< talisman <<<
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
