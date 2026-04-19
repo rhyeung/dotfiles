@@ -1,9 +1,17 @@
 ## DEFAULT
 set -o vi
 
-#export PATH="$HOME/bin:$PATH"
+## General
+export PATH="$HOME/bin:$PATH"
+export EDITOR=vim
+export VISUAL=vim
+
 ## GO
-export PATH="/usr/local/go/bin:/Users/ray/.cargo/bin:$PATH"
+export PATH="/usr/local/go/bin:$HOME/.cargo/bin:$PATH"
+
+## Gemini
+export SANDBOX_FLAGS="-v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+export GOOGLE_CLOUD_PROJECT="gen-lang-client-0947751397"
 
 # Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
