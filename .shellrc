@@ -10,8 +10,14 @@ export VISUAL=vim
 export PATH="/usr/local/go/bin:$HOME/.cargo/bin:$PATH"
 
 ## Gemini
+# For git push
 export SANDBOX_FLAGS="-v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
 export GOOGLE_CLOUD_PROJECT="gen-lang-client-0947751397"
+export OTLP_GOOGLE_CLOUD_PROJECT="$GOOGLE_CLOUD_PROJECT"
+# Force the exporter to omit non-critical metadata
+export GEMINI_TELEMETRY_LEVEL="ESSENTIAL"
+# Stop the "TimeSeries failed" error from printing
+export GEMINI_TELEMETRY_IGNORE_SHUTDOWN_ERRORS=true
 
 # Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
