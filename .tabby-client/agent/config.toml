@@ -1,0 +1,94 @@
+## Tabby agent configuration file
+## Online documentation: https://tabby.tabbyml.com/docs/extensions/configurations
+
+[server]
+## Specifies the endpoint and token for connecting to the Tabby server.
+endpoint = "http://localhost:8080"
+token = ""
+
+## You can add custom request headers.
+# [server.requestHeaders]
+# Header1 = "Value1"
+
+## Timeout for requests in milliseconds.
+# requestTimeout = 120000
+
+[proxy]
+## You can specify an optional http/https proxy when required, overrides environment variable settings.
+# url = "http://your-proxy-server"
+# authorization = "Basic base64_auth"
+
+[completion.prompt]
+## Max lines of context above and below the cursor.
+# maxPrefixLines = 20
+# maxSuffixLines = 20
+
+## Context from declaration snippets (LSP).
+# [completion.prompt.fillDeclarations]
+# enabled = true
+# maxSnippets = 5
+# maxCharsPerSnippet = 500
+
+## Context from recently changed files.
+# [completion.prompt.collectSnippetsFromRecentChangedFiles]
+# enabled = true
+# maxSnippets = 3
+# [completion.prompt.collectSnippetsFromRecentChangedFiles.indexing]
+# checkingChangesInterval = 500
+# changesDebouncingInterval = 1000
+# prefixLines = 20
+# suffixLines = 20
+# maxChunks = 100
+# chunkSize = 500
+# overlapLines = 1
+
+## Context from recently opened files.
+# [completion.prompt.collectSnippetsFromRecentOpenedFiles]
+# enabled = true
+# maxOpenedFiles = 5
+# maxCharsPerOpenedFiles = 500
+
+## Context from clipboard.
+# [completion.prompt.clipboard]
+# minChars = 3
+# maxChars = 2000
+
+[completion.debounce]
+## mode: "adaptive" or "fixed"
+# mode = "adaptive"
+# interval = 250
+
+[completion.solution]
+## The max number of unique choices to be fetched before stopping.
+# maxItems = 3
+## The max number of attempts to fetch choices before stopping.
+# maxTries = 6
+## The temperature for fetching the second and subsequent choices.
+# temperature = 0.8
+
+[postprocess]
+## Minimum characters required in a completion to be shown.
+# minCompletionChars = 4
+
+[chat.edit]
+## Configuration for the chat-edit feature.
+# documentMaxChars = 3000
+# commandMaxChars = 200
+
+[chat.generateCommitMessage]
+## Template used to generate commit messages from diffs.
+# maxDiffLength = 3600
+# promptTemplate = "Write a git commit message for: {{diff}}"
+
+[logs]
+## Controls the level of the logger written to the ~/.tabby-client/agent/logs/
+## Options: "silent", "error", "info", "debug", "trace"
+level = "debug"
+
+[tls]
+## "bundled", "system", or a string pointing to a cert file.
+# caCerts = "system"
+
+[anonymousUsageTracking]
+## Opt-out of anonymous usage data collection.
+disable = true

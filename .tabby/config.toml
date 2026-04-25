@@ -1,0 +1,69 @@
+## Tabby Server Configuration
+## Online documentation: https://tabby.tabbyml.com/docs/configuration/
+
+[server]
+## Host and Port to listen on.
+host = "0.0.0.0"
+port = 8080
+## The timeout in seconds for the /v1/completion api.
+completion_timeout = 30
+
+[model.completion.local]
+## Local model configuration for Ghost Text.
+model_id = "DeepSeekCoder-1.3B"
+# parallelism = 4
+# num_gpu_layers = 9999
+# context_size = 4096
+
+[model.embedding.local]
+## Required for context retrieval (RAG).
+model_id = "Nomic-Embed-Text"
+# parallelism = 1
+# num_gpu_layers = 9999
+
+# [model.chat.local]
+## Optional chat model configuration.
+# model_id = "Qwen2-1.5B-Instruct"
+
+# [[repositories]]
+## Repositories for the indexer to process.
+# git_url = "https://github.com/TabbyML/tabby"
+# refs = ["main"]
+
+[completion]
+## Default completion parameters.
+# max_input_length = 1536
+# max_decoding_tokens = 64
+
+# [completion.code_search_params]
+## Fine-tune retrieval for completions.
+# min_embedding_score = 0.5
+# min_bm25_score = -1.0
+# min_rrf_score = -1.0
+# num_to_return = 10
+# num_to_score = 100
+
+[completion.prompt]
+## Experimental: Better handling of brackets.
+# experimentalStripAutoClosingCharacters = true
+
+[answer]
+## Chat/QA settings.
+# presence_penalty = 0.5
+# system_prompt = "You are 'Tabby'..."
+# [answer.code_search_params]
+# min_embedding_score = 0.5
+# num_to_return = 10
+
+[postprocess.limitScope]
+## Experimental: Use syntax parser to limit completion scope.
+# experimentalSyntax = true
+# experimentalKeepBlockScopeWhenCompletingLine = true
+
+[postprocess.calculateReplaceRange]
+## Experimental: Accurate replacement range using syntax trees.
+# experimentalSyntax = true
+
+# [embedding]
+## Maximum input length for embedding model.
+# max_input_length = 5120
