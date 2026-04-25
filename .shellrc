@@ -19,6 +19,11 @@ export GEMINI_TELEMETRY_LEVEL="ESSENTIAL"
 # Stop the "TimeSeries failed" error from printing
 export GEMINI_TELEMETRY_IGNORE_SHUTDOWN_ERRORS=true
 
+# TabbyML
+# Performance tweaks for Apple Silicon
+export LLAMA_CPP_FAST_ATTENTION=1
+export LLAMA_CPP_N_GPU_LAYERS=9999
+
 # Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
