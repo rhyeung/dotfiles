@@ -19,7 +19,7 @@ Plugin 'easymotion/vim-easymotion'
 Plugin 'arcticicestudio/nord-vim'
 
 colorscheme nord
-highlight Visual ctermbg=DarkGray ctermfg=12
+highlight Visual ctermbg=DarkGray ctermfg=White
 
 let g:airline_powerline_fonts=1
 set relativenumber
