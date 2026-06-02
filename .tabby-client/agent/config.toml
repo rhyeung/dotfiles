@@ -4,7 +4,7 @@
 [server]
 ## Specifies the endpoint and token for connecting to the Tabby server.
 endpoint = "http://localhost:8080"
-token = ""
+token = "auth_c85c7d698bc040529a6c625a6eb0f81b"
 
 ## You can add custom request headers.
 # [server.requestHeaders]
