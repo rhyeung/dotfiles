@@ -175,24 +175,30 @@ def main():
             if os.path.exists(transcript_path):
                 with open(transcript_path, "r", encoding="utf-8") as f:
                     for line in f:
-                        if '"type":"USER_INPUT"' in line:
+                        if '"type":"PLANNER_RESPONSE"' in line:
                             req_count += 1
             
-            history_path = "/Users/ray/.gemini/antigravity-cli/history.jsonl"
             today_reqs = 0
             today_date = datetime.date.today()
-            if os.path.exists(history_path):
-                with open(history_path, "r", encoding="utf-8") as f:
-                    for line in f:
-                        try:
-                            item = json.loads(line)
-                            ts = item.get("timestamp")
-                            if ts:
-                                dt = datetime.datetime.fromtimestamp(ts / 1000.0)
-                                if dt.date() == today_date:
-                                    today_reqs += 1
-                        except Exception:
-                            pass
+            brain_dir = "/Users/ray/.gemini/antigravity-cli/brain"
+            if os.path.exists(brain_dir):
+                for conv_dir in os.listdir(brain_dir):
+                    t_path = os.path.join(brain_dir, conv_dir, ".system_generated/logs/transcript.jsonl")
+                    if os.path.exists(t_path):
+                        with open(t_path, "r", encoding="utf-8") as f:
+                            for line in f:
+                                if '"type":"PLANNER_RESPONSE"' in line:
+                                    idx = line.find('"created_at":"')
+                                    if idx != -1:
+                                        # Extract ISO timestamp e.g. 2026-06-08T14:06:52Z
+                                        iso_str = line[idx+14 : idx+34]
+                                        try:
+                                            dt_utc = datetime.datetime.fromisoformat(iso_str.replace('Z', '+00:00'))
+                                            dt_local = dt_utc.astimezone()
+                                            if dt_local.date() == today_date:
+                                                today_reqs += 1
+                                        except Exception:
+                                            pass
 
             if req_count > 0:
                 if today_reqs > 0:
