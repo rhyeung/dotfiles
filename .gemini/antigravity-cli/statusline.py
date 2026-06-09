@@ -161,8 +161,21 @@ def main():
                     token_str = f" ({tokens/1_000:.0f}k tkn)"
                 else:
                     token_str = f" ({tokens} tkn)"
-                    
-            parts.append(f"Context: {BOLD}{color}{pct}%{RESET}{token_str}")
+            
+            # Extract 3 stats from current_usage
+            cur_usage = context.get("current_usage") or {}
+            in_t = cur_usage.get("input_tokens", 0)
+            out_t = cur_usage.get("output_tokens", 0)
+            cache_t = cur_usage.get("cache_read_input_tokens", 0)
+            
+            def fmt_num(n):
+                if n >= 1000:
+                    val = n / 1000
+                    return f"{int(val)}k" if val.is_integer() else f"{val:.1f}k"
+                return str(n)
+                
+            usage_str = f" [📥{fmt_num(in_t)} 📤{fmt_num(out_t)} ⚡{fmt_num(cache_t)}]"
+            parts.append(f"Context: {BOLD}{color}{pct}%{RESET}{token_str}{usage_str}")
 
     # Active tasks and subagents
     tasks = data.get("task_count")
