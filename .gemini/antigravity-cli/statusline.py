@@ -114,7 +114,7 @@ def main():
     model_name = raw_model_name.replace("Gemini ", "").replace(" (Medium)", "").replace(" (Large)", "")
     if not model_name:
         model_name = "Gemini"
-    parts.append(f"🧠 Model: {BOLD}{GREEN}{model_name}{RESET}")
+    parts.append(f"🤖 {BOLD}{GREEN}{model_name}{RESET}")
 
     # Fetch quota info for current model
     rem, ms, reset_time = None, None, None
@@ -132,11 +132,40 @@ def main():
 
     # Git branch information
     vcs = data.get("vcs", {})
-    if vcs and vcs.get("branch"):
-        branch = vcs.get("branch")
-        dirty = "*" if vcs.get("dirty") else ""
-        dirty_color = RED if dirty else RESET
-        parts.append(f" {MAGENTA}{branch}{dirty_color}{dirty}{RESET}")
+    branch = vcs.get("branch")
+    dirty = vcs.get("dirty")
+    if vcs and vcs.get("type") == "git" and not branch and cwd:
+        try:
+            proc = subprocess.run(
+                ["git", "-C", cwd, "status", "--porcelain", "-b"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            lines = proc.stdout.splitlines()
+            if lines:
+                first_line = lines[0]
+                if first_line.startswith("## "):
+                    branch_part = first_line[3:].strip()
+                    if "..." in branch_part:
+                        branch = branch_part.split("...")[0]
+                    else:
+                        branch = branch_part.split()[0] if branch_part else "HEAD"
+                dirty = len(lines) > 1
+        except Exception:
+            pass
+
+    if branch:
+        dirty_str = "*" if dirty else ""
+        dirty_color = RED if dirty_str else RESET
+        parts.append(f" {MAGENTA}{branch}{dirty_color}{dirty_str}{RESET}")
+
+    # Sandbox configuration
+    sandbox_info = data.get("sandbox") or {}
+    if sandbox_info.get("enabled"):
+        parts.append(f"🛡️ {BOLD}{GREEN}Sandbox{RESET}")
+    else:
+        parts.append(f"🔓 {BOLD}{RED}Host{RESET}")
 
     # Context and tokens
     context = data.get("context_window", {})
@@ -175,12 +204,25 @@ def main():
                 return str(n)
                 
             usage_str = f" [📥{fmt_num(in_t)} 📤{fmt_num(out_t)} ⚡{fmt_num(cache_t)}]"
-            parts.append(f"Context: {BOLD}{color}{pct}%{RESET}{token_str}{usage_str}")
+            parts.append(f"Ctx: {BOLD}{color}{pct}%{RESET}{token_str}{usage_str}")
 
-    # Active tasks and subagents
-    tasks = data.get("task_count")
-    if tasks:
-        parts.append(f"⚙️ Tasks: {BOLD}{YELLOW}{tasks}{RESET}")
+    # Active background tasks
+    bg_tasks = data.get("background_tasks") or []
+    if bg_tasks:
+        task_names = [t.get("name") or str(t.get("index", "")) for t in bg_tasks]
+        task_str = f"⚙️ Tasks: {BOLD}{YELLOW}{len(bg_tasks)}{RESET}"
+        if len(bg_tasks) == 1:
+            task_str += f" ({task_names[0]})"
+        parts.append(task_str)
+    else:
+        tasks = data.get("task_count")
+        if tasks:
+            parts.append(f"⚙️ Tasks: {BOLD}{YELLOW}{tasks}{RESET}")
+
+    # Active subagents
+    subagents = data.get("subagents") or []
+    if subagents:
+        parts.append(f"👥 Subagents: {BOLD}{CYAN}{len(subagents)}{RESET}")
 
     # Artifacts count
     artifacts = data.get("artifact_count")
@@ -225,25 +267,31 @@ def main():
             
             today_reqs = 0
             today_date = datetime.date.today()
+            local_midnight = datetime.datetime.combine(today_date, datetime.time.min).timestamp()
             brain_dir = "/Users/ray/.gemini/antigravity-cli/brain"
             if os.path.exists(brain_dir):
                 for conv_dir in os.listdir(brain_dir):
                     t_path = os.path.join(brain_dir, conv_dir, ".system_generated/logs/transcript.jsonl")
                     if os.path.exists(t_path):
-                        with open(t_path, "r", encoding="utf-8") as f:
-                            for line in f:
-                                if '"type":"PLANNER_RESPONSE"' in line:
-                                    idx = line.find('"created_at":"')
-                                    if idx != -1:
-                                        # Extract ISO timestamp e.g. 2026-06-08T14:06:52Z
-                                        iso_str = line[idx+14 : idx+34]
-                                        try:
-                                            dt_utc = datetime.datetime.fromisoformat(iso_str.replace('Z', '+00:00'))
-                                            dt_local = dt_utc.astimezone()
-                                            if dt_local.date() == today_date:
-                                                today_reqs += 1
-                                        except Exception:
-                                            pass
+                        try:
+                            # Optimize: Only read files modified today
+                            if os.path.getmtime(t_path) >= local_midnight:
+                                with open(t_path, "r", encoding="utf-8") as f:
+                                    for line in f:
+                                        if '"type":"PLANNER_RESPONSE"' in line:
+                                            idx = line.find('"created_at":"')
+                                            if idx != -1:
+                                                # Extract ISO timestamp e.g. 2026-06-08T14:06:52Z
+                                                iso_str = line[idx+14 : idx+34]
+                                                try:
+                                                    dt_utc = datetime.datetime.fromisoformat(iso_str.replace('Z', '+00:00'))
+                                                    dt_local = dt_utc.astimezone()
+                                                    if dt_local.date() == today_date:
+                                                        today_reqs += 1
+                                                except Exception:
+                                                    pass
+                        except Exception:
+                            pass
 
             if req_count > 0:
                 if today_reqs > 0:
@@ -252,6 +300,11 @@ def main():
                     parts.append(f"💬 Reqs: {BOLD}{YELLOW}{req_count}{RESET}")
         except Exception:
             pass
+
+    # Pending input count (Queue)
+    pending_inputs = data.get("pending_input_count", 0)
+    if pending_inputs > 0:
+        parts.append(f"📬 Queue: {BOLD}{YELLOW}{pending_inputs}{RESET}")
 
     # Quota and rolling reset information
     if rem is not None:
@@ -268,7 +321,7 @@ def main():
                 quota_color = RED
             
             reset_info = f" ({time_str})" if time_str else ""
-            parts.append(f"⏳ 5h Limit: {BOLD}{quota_color}{used_pct}%{RESET}{reset_info}")
+            parts.append(f"⏳ 5h: {BOLD}{quota_color}{used_pct}%{RESET}{reset_info}")
         except Exception:
             pass
 
@@ -297,9 +350,12 @@ def main():
         if note_parts:
             parts.append(f"🔔 {', '.join(note_parts)}")
 
-    # Agent execution state
+    # Agent execution state & Tool confirmation
+    is_confirming = data.get("tool_confirmation_pending", False)
     state = data.get("agent_state") or data.get("status")
-    if state:
+    if is_confirming:
+        parts.append(f"[{BOLD}{RED}CONFIRM PENDING{RESET}]")
+    elif state:
         state_color = GREEN if state.lower() == "idle" else CYAN
         parts.append(f"[{state_color}{state.upper()}{RESET}]")
 
