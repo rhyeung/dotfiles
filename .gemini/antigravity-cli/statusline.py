@@ -20,7 +20,7 @@ def format_reset_time(ms):
 
 def get_quota_info(model_label):
     if not model_label:
-        return None, None
+        return None, None, None
         
     cache_path = "/Users/ray/.gemini/antigravity-cli/scratch/quota_cache.json"
     now = time.time()
@@ -64,16 +64,16 @@ def get_quota_info(model_label):
             
             # Exact matches
             if target == m_label or target == m_id:
-                return m.get("remainingPercentage"), m.get("timeUntilResetMs")
+                return m.get("remainingPercentage"), m.get("timeUntilResetMs"), m.get("resetTime")
                 
             # Secondary heuristic matches
             if normalized_target and (normalized_target in m_label or normalized_target in m_id):
                 best_match = m
                 
         if best_match:
-            return best_match.get("remainingPercentage"), best_match.get("timeUntilResetMs")
+            return best_match.get("remainingPercentage"), best_match.get("timeUntilResetMs"), best_match.get("resetTime")
                 
-    return None, None
+    return None, None, None
 
 def main():
     try:
@@ -115,6 +115,14 @@ def main():
     if not model_name:
         model_name = "Gemini"
     parts.append(f"🧠 Model: {BOLD}{GREEN}{model_name}{RESET}")
+
+    # Fetch quota info for current model
+    rem, ms, reset_time = None, None, None
+    if raw_model_name:
+        try:
+            rem, ms, reset_time = get_quota_info(raw_model_name)
+        except Exception:
+            pass
 
     # Workspace directory
     cwd = data.get("cwd", "")
@@ -172,11 +180,35 @@ def main():
         try:
             transcript_path = f"/Users/ray/.gemini/antigravity-cli/brain/{conversation_id}/.system_generated/logs/transcript.jsonl"
             req_count = 0
+            
+            # Filter requests in the current conversation to only those in the current quota period
+            quota_start_dt = None
+            if reset_time:
+                try:
+                    reset_dt = datetime.datetime.fromisoformat(reset_time.replace('Z', '+00:00'))
+                    quota_start_dt = reset_dt - datetime.timedelta(hours=5)
+                except Exception:
+                    pass
+
             if os.path.exists(transcript_path):
                 with open(transcript_path, "r", encoding="utf-8") as f:
                     for line in f:
                         if '"type":"PLANNER_RESPONSE"' in line:
-                            req_count += 1
+                            try:
+                                step = json.loads(line)
+                                if step.get("type") == "PLANNER_RESPONSE":
+                                    if quota_start_dt:
+                                        created_at = step.get("created_at")
+                                        if created_at:
+                                            req_dt = datetime.datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                                            if req_dt >= quota_start_dt:
+                                                req_count += 1
+                                        else:
+                                            req_count += 1
+                                    else:
+                                        req_count += 1
+                            except Exception:
+                                req_count += 1
             
             today_reqs = 0
             today_date = datetime.date.today()
@@ -209,25 +241,48 @@ def main():
             pass
 
     # Quota and rolling reset information
-    if raw_model_name:
+    if rem is not None:
         try:
-            rem, ms = get_quota_info(raw_model_name)
-            if rem is not None:
-                used_pct = int((1 - rem) * 100)
-                time_str = format_reset_time(ms)
-                
-                # Dynamic coloring based on used percentage
-                if used_pct <= 50:
-                    quota_color = GREEN
-                elif used_pct <= 80:
-                    quota_color = YELLOW
-                else:
-                    quota_color = RED
-                
-                reset_info = f" ({time_str})" if time_str else ""
-                parts.append(f"⏳ 5h Limit: {BOLD}{quota_color}{used_pct}%{RESET}{reset_info}")
+            used_pct = int((1 - rem) * 100)
+            time_str = format_reset_time(ms)
+            
+            # Dynamic coloring based on used percentage
+            if used_pct <= 50:
+                quota_color = GREEN
+            elif used_pct <= 80:
+                quota_color = YELLOW
+            else:
+                quota_color = RED
+            
+            reset_info = f" ({time_str})" if time_str else ""
+            parts.append(f"⏳ 5h Limit: {BOLD}{quota_color}{used_pct}%{RESET}{reset_info}")
         except Exception:
             pass
+
+    # Notifications/Updates
+    notifications = data.get("notifications")
+    if notifications:
+        note_parts = []
+        for note in notifications:
+            if isinstance(note, dict):
+                msg = note.get("message") or note.get("content") or note.get("text")
+                if not msg:
+                    msg = str(note)
+                
+                priority = note.get("priority", "").upper()
+                if "HIGH" in priority:
+                    msg = f"{RED}{msg}{RESET}"
+                elif "WARNING" in priority or "MEDIUM" in priority:
+                    msg = f"{YELLOW}{msg}{RESET}"
+                else:
+                    msg = f"{CYAN}{msg}{RESET}"
+                
+                note_parts.append(msg)
+            else:
+                note_parts.append(f"{CYAN}{str(note)}{RESET}")
+        
+        if note_parts:
+            parts.append(f"🔔 {', '.join(note_parts)}")
 
     # Agent execution state
     state = data.get("agent_state") or data.get("status")
