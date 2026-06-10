@@ -145,3 +145,7 @@ export TALISMAN_INTERACTIVE=false
 # <<< talisman <<<
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/ray/.local/bin:$PATH"

@@ -21,10 +21,10 @@ def format_reset_time(ms):
 def get_quota_info(model_label):
     if not model_label:
         return None, None, None
-        
+
     cache_path = "/Users/ray/.gemini/antigravity-cli/scratch/quota_cache.json"
     now = time.time()
-    
+
     # Try reading cache
     cache_data = None
     if os.path.exists(cache_path):
@@ -33,13 +33,13 @@ def get_quota_info(model_label):
                 cache_data = json.load(f)
         except Exception:
             pass
-            
+
     # Check if cache is expired (5 minutes)
     is_expired = True
     if cache_data and "timestamp" in cache_data:
         if now - cache_data["timestamp"] < 300: # 5 minutes
             is_expired = False
-            
+
     if is_expired:
         try:
             # Run the command asynchronously to update the cache file in the background
@@ -56,30 +56,30 @@ def get_quota_info(model_label):
     if cache_data and "models" in cache_data:
         target = model_label.lower().strip()
         normalized_target = target.replace("gemini ", "").replace(" (medium)", "").replace(" (high)", "").replace(" (low)", "").strip()
-        
+
         best_match = None
         for m in cache_data["models"]:
             m_label = m.get("label", "").lower().strip()
             m_id = m.get("modelId", "").lower().strip()
-            
+
             # Exact matches
             if target == m_label or target == m_id:
                 return m.get("remainingPercentage"), m.get("timeUntilResetMs"), m.get("resetTime")
-                
+
             # Secondary heuristic matches
             if normalized_target and (normalized_target in m_label or normalized_target in m_id):
                 best_match = m
-                
+
         if best_match:
             return best_match.get("remainingPercentage"), best_match.get("timeUntilResetMs"), best_match.get("resetTime")
-                
+
     return None, None, None
 
 def main():
     try:
         # Read JSON from stdin
         raw_input = sys.stdin.read()
-        
+
         # Write payload to scratch for debugging/reference
         try:
             scratch_dir = "/Users/ray/.gemini/antigravity-cli/scratch"
@@ -108,13 +108,38 @@ def main():
 
     parts = []
 
-    # Model details
+    # Model details (used for quota info lookup)
     model = data.get("model") or {}
     raw_model_name = model.get("display_name") or model.get("id") or ""
-    model_name = raw_model_name.replace("Gemini ", "").replace(" (Medium)", "").replace(" (Large)", "")
-    if not model_name:
-        model_name = "Gemini"
-    parts.append(f"🤖 {BOLD}{GREEN}{model_name}{RESET}")
+
+    # Authentication credentials check
+    settings_path = "/Users/ray/.gemini/antigravity-cli/settings.json"
+    use_g1 = False
+    if os.path.exists(settings_path):
+        try:
+            with open(settings_path, "r") as f:
+                settings_data = json.load(f)
+                use_g1 = settings_data.get("useG1Credits", False)
+        except Exception:
+            pass
+
+    api_key = os.environ.get("ANTIGRAVITY_API_KEY")
+    if api_key and use_g1:
+        parts.append(f"🔑 {BOLD}{CYAN}Key{RESET}")
+    else:
+        cache_path = "/Users/ray/.gemini/antigravity-cli/scratch/quota_cache.json"
+        email = None
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, "r") as f:
+                    cache_data = json.load(f)
+                    email = cache_data.get("email")
+            except Exception:
+                pass
+        if email:
+            parts.append(f"📧 {BOLD}{CYAN}Login{RESET}")
+        else:
+            parts.append(f"📧 {BOLD}{RED}No Login{RESET}")
 
     # Fetch quota info for current model
     rem, ms, reset_time = None, None, None
@@ -180,7 +205,7 @@ def main():
                 color = YELLOW
             else:
                 color = RED
-            
+
             token_str = ""
             if tokens is not None:
                 tokens = int(tokens)
@@ -190,19 +215,19 @@ def main():
                     token_str = f" ({tokens/1_000:.0f}k tkn)"
                 else:
                     token_str = f" ({tokens} tkn)"
-            
+
             # Extract 3 stats from current_usage
             cur_usage = context.get("current_usage") or {}
             in_t = cur_usage.get("input_tokens", 0)
             out_t = cur_usage.get("output_tokens", 0)
             cache_t = cur_usage.get("cache_read_input_tokens", 0)
-            
+
             def fmt_num(n):
                 if n >= 1000:
                     val = n / 1000
                     return f"{int(val)}k" if val.is_integer() else f"{val:.1f}k"
                 return str(n)
-                
+
             usage_str = f" [📥{fmt_num(in_t)} 📤{fmt_num(out_t)} ⚡{fmt_num(cache_t)}]"
             parts.append(f"Ctx: {BOLD}{color}{pct}%{RESET}{token_str}{usage_str}")
 
@@ -235,7 +260,7 @@ def main():
         try:
             transcript_path = f"/Users/ray/.gemini/antigravity-cli/brain/{conversation_id}/.system_generated/logs/transcript.jsonl"
             req_count = 0
-            
+
             # Filter requests in the current conversation to only those in the current quota period
             quota_start_dt = None
             if reset_time:
@@ -264,7 +289,7 @@ def main():
                                         req_count += 1
                             except Exception:
                                 req_count += 1
-            
+
             today_reqs = 0
             today_date = datetime.date.today()
             local_midnight = datetime.datetime.combine(today_date, datetime.time.min).timestamp()
@@ -311,7 +336,7 @@ def main():
         try:
             used_pct = int((1 - rem) * 100)
             time_str = format_reset_time(ms)
-            
+
             # Dynamic coloring based on used percentage
             if used_pct <= 50:
                 quota_color = GREEN
@@ -319,36 +344,11 @@ def main():
                 quota_color = YELLOW
             else:
                 quota_color = RED
-            
+
             reset_info = f" ({time_str})" if time_str else ""
             parts.append(f"⏳ 5h: {BOLD}{quota_color}{used_pct}%{RESET}{reset_info}")
         except Exception:
             pass
-
-    # Notifications/Updates
-    notifications = data.get("notifications")
-    if notifications:
-        note_parts = []
-        for note in notifications:
-            if isinstance(note, dict):
-                msg = note.get("message") or note.get("content") or note.get("text")
-                if not msg:
-                    msg = str(note)
-                
-                priority = note.get("priority", "").upper()
-                if "HIGH" in priority:
-                    msg = f"{RED}{msg}{RESET}"
-                elif "WARNING" in priority or "MEDIUM" in priority:
-                    msg = f"{YELLOW}{msg}{RESET}"
-                else:
-                    msg = f"{CYAN}{msg}{RESET}"
-                
-                note_parts.append(msg)
-            else:
-                note_parts.append(f"{CYAN}{str(note)}{RESET}")
-        
-        if note_parts:
-            parts.append(f"🔔 {', '.join(note_parts)}")
 
     # Agent execution state & Tool confirmation
     is_confirming = data.get("tool_confirmation_pending", False)
