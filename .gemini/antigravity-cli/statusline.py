@@ -3,7 +3,6 @@ import sys
 import json
 import os
 import time
-import datetime
 import subprocess
 
 def format_reset_time(ms):
@@ -34,10 +33,10 @@ def get_quota_info(model_label):
         except Exception:
             pass
 
-    # Check if cache is expired (5 minutes)
+    # Check if cache is expired (30 seconds)
     is_expired = True
     if cache_data and "timestamp" in cache_data:
-        if now - cache_data["timestamp"] < 300: # 5 minutes
+        if now - cache_data["timestamp"] < 30:
             is_expired = False
 
     if is_expired:
@@ -75,62 +74,90 @@ def get_quota_info(model_label):
 
     return None, None, None
 
+def get_session_cache(conversation_id, total_in, total_out, msg_cache):
+    if not conversation_id:
+        return msg_cache
+
+    cache_path = "/Users/ray/.gemini/antigravity-cli/scratch/session_cache.json"
+    data = {}
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, "r") as f:
+                data = json.load(f)
+        except Exception:
+            pass
+
+    entry = data.get(conversation_id) or {
+        "last_total_input_tokens": 0,
+        "last_total_output_tokens": 0,
+        "accumulated_cache_read_tokens": 0
+    }
+
+    is_new_turn = (
+        total_in != entry["last_total_input_tokens"] or
+        total_out != entry["last_total_output_tokens"]
+    )
+
+    if is_new_turn:
+        entry["accumulated_cache_read_tokens"] += msg_cache
+        entry["last_total_input_tokens"] = total_in
+        entry["last_total_output_tokens"] = total_out
+        data[conversation_id] = entry
+        try:
+            with open(cache_path, "w") as f:
+                json.dump(data, f)
+        except Exception:
+            pass
+
+    return entry["accumulated_cache_read_tokens"]
+
 def main():
     try:
         # Read JSON from stdin
         raw_input = sys.stdin.read()
-
-        # Write payload to scratch for debugging/reference
-        try:
-            scratch_dir = "/Users/ray/.gemini/antigravity-cli/scratch"
-            os.makedirs(scratch_dir, exist_ok=True)
-            with open(os.path.join(scratch_dir, "status_payload.json"), "w") as f:
-                f.write(raw_input)
-        except Exception:
-            pass
-
         data = json.loads(raw_input)
     except Exception:
         # Fallback if stdin is empty or invalid JSON
-        print("\033[1;36m🤖 Antigravity\033[0m | Ready")
+        print("\033[1;36m🤖 Antigravity\033[0m · Ready")
         return
 
-    # ANSI Colors
+    # ANSI Helpers (Standard 16-color palette only)
     RESET = "\033[0m"
     BOLD = "\033[1m"
-    CYAN = "\033[36m"
-    GREEN = "\033[32m"
-    YELLOW = "\033[33m"
-    RED = "\033[31m"
     MAGENTA = "\033[35m"
-    BLUE = "\033[34m"
-    WHITE = "\033[37m"
 
-    parts = []
+    # Foreground accents (Standard 16 colors)
+    FG_GRAY = "\033[90m"
+    FG_RED = "\033[31m"
+    FG_GREEN = "\033[32m"
+    FG_YELLOW = "\033[33m"
+    FG_WHITE = "\033[37m"
+    FG_BRIGHT_RED = "\033[91m"
+    FG_BRIGHT_GREEN = "\033[92m"
+    FG_BRIGHT_YELLOW = "\033[93m"
+    FG_BRIGHT_MAGENTA = "\033[95m"
+    FG_BRIGHT_CYAN = "\033[96m"
+    FG_BRIGHT_WHITE = "\033[97m"
 
-    # Model details (used for quota info lookup)
-    model = data.get("model") or {}
-    raw_model_name = model.get("display_name") or model.get("id") or ""
+    # Number Highlight Color
+    NUM_COLOR = FG_BRIGHT_WHITE + BOLD
 
-    # Fetch quota info for current model
-    rem, ms, reset_time = None, None, None
-    if raw_model_name:
-        try:
-            rem, ms, reset_time = get_quota_info(raw_model_name)
-        except Exception:
-            pass
+    # Parse fields
+    state = data.get("agent_state") or data.get("status") or "idle"
+    context = data.get("context_window") or {}
+    used_pct = context.get("used_percentage") or 0.0
 
-    # Workspace directory
+    total_in = context.get("total_input_tokens") or 0
+    total_out = context.get("total_output_tokens") or 0
+
     cwd = data.get("cwd", "")
-    if cwd:
-        folder_name = os.path.basename(cwd)
-        parts.append(f"📁 {BOLD}{WHITE}{folder_name}{RESET}")
+    conversation_id = data.get("conversation_id", "")
+    vcs = data.get("vcs") or {}
+    vcs_branch = vcs.get("branch") or ""
+    vcs_dirty = vcs.get("dirty") or False
 
-    # Git branch information
-    vcs = data.get("vcs", {})
-    branch = vcs.get("branch")
-    dirty = vcs.get("dirty")
-    if vcs and vcs.get("type") == "git" and not branch and cwd:
+    # Git branch information fallback
+    if vcs and vcs.get("type") == "git" and not vcs_branch and cwd:
         try:
             proc = subprocess.run(
                 ["git", "-C", cwd, "status", "--porcelain", "-b"],
@@ -144,196 +171,170 @@ def main():
                 if first_line.startswith("## "):
                     branch_part = first_line[3:].strip()
                     if "..." in branch_part:
-                        branch = branch_part.split("...")[0]
+                        vcs_branch = branch_part.split("...")[0]
                     else:
-                        branch = branch_part.split()[0] if branch_part else "HEAD"
-                dirty = len(lines) > 1
+                        vcs_branch = branch_part.split()[0] if branch_part else "HEAD"
+                vcs_dirty = len(lines) > 1
         except Exception:
             pass
 
-    if branch:
-        dirty_str = "*" if dirty else ""
-        dirty_color = RED if dirty_str else RESET
-        parts.append(f" {MAGENTA}{branch}{dirty_color}{dirty_str}{RESET}")
-
-    # Sandbox configuration
     sandbox_info = data.get("sandbox") or {}
-    if sandbox_info.get("enabled"):
-        parts.append(f"🛡️ {BOLD}{GREEN}Sandbox{RESET}")
-    else:
-        parts.append(f"🔓 {BOLD}{RED}Host{RESET}")
+    sandbox_enabled = sandbox_info.get("enabled") or False
 
-    # Context and tokens
-    context = data.get("context_window", {})
-    if context:
-        used_pct = context.get("used_percentage")
-        tokens = context.get("total_input_tokens")
-        if used_pct is not None:
-            pct = int(used_pct)
-            if pct <= 50:
-                color = GREEN
-            elif pct <= 80:
-                color = YELLOW
-            else:
-                color = RED
+    artifacts = data.get("artifact_count") or 0
 
-            token_str = ""
-            if tokens is not None:
-                tokens = int(tokens)
-                if tokens >= 1_000_000:
-                    token_str = f" ({tokens/1_000_000:.1f}M tkn)"
-                elif tokens >= 1_000:
-                    token_str = f" ({tokens/1_000:.0f}k tkn)"
-                else:
-                    token_str = f" ({tokens} tkn)"
+    subagents_list = data.get("subagents")
+    subagents = len(subagents_list) if isinstance(subagents_list, list) else 0
 
-            # Extract 3 stats from current_usage
-            cur_usage = context.get("current_usage") or {}
-            in_t = cur_usage.get("input_tokens", 0)
-            out_t = cur_usage.get("output_tokens", 0)
-            cache_t = cur_usage.get("cache_read_input_tokens", 0)
+    bg_tasks = data.get("background_tasks")
+    task_count = len(bg_tasks) if isinstance(bg_tasks, list) else (data.get("task_count") or 0)
 
-            def fmt_num(n):
-                if n >= 1000:
-                    val = n / 1000
-                    return f"{int(val)}k" if val.is_integer() else f"{val:.1f}k"
-                return str(n)
+    model = data.get("model") or {}
+    raw_model_name = model.get("display_name") or model.get("id") or ""
 
-            usage_str = f" [📥{fmt_num(in_t)} 📤{fmt_num(out_t)} ⚡{fmt_num(cache_t)}]"
-            parts.append(f"Ctx: {BOLD}{color}{pct}%{RESET}{token_str}{usage_str}")
-
-    # Active background tasks
-    bg_tasks = data.get("background_tasks") or []
-    if bg_tasks:
-        task_names = [t.get("name") or str(t.get("index", "")) for t in bg_tasks]
-        task_str = f"⚙️ Tasks: {BOLD}{YELLOW}{len(bg_tasks)}{RESET}"
-        if len(bg_tasks) == 1:
-            task_str += f" ({task_names[0]})"
-        parts.append(task_str)
-    else:
-        tasks = data.get("task_count")
-        if tasks:
-            parts.append(f"⚙️ Tasks: {BOLD}{YELLOW}{tasks}{RESET}")
-
-    # Active subagents
-    subagents = data.get("subagents") or []
-    if subagents:
-        parts.append(f"👥 Subagents: {BOLD}{CYAN}{len(subagents)}{RESET}")
-
-    # Artifacts count
-    artifacts = data.get("artifact_count")
-    if artifacts:
-        parts.append(f"📄 Docs: {BOLD}{BLUE}{artifacts}{RESET}")
-
-    # Requests count
-    conversation_id = data.get("conversation_id")
-    if conversation_id:
+    # Fetch quota info for current model
+    rem, ms, _ = None, None, None
+    if raw_model_name:
         try:
-            transcript_path = f"/Users/ray/.gemini/antigravity-cli/brain/{conversation_id}/.system_generated/logs/transcript.jsonl"
-            req_count = 0
-
-            # Filter requests in the current conversation to only those in the current quota period
-            quota_start_dt = None
-            if reset_time:
-                try:
-                    reset_dt = datetime.datetime.fromisoformat(reset_time.replace('Z', '+00:00'))
-                    quota_start_dt = reset_dt - datetime.timedelta(hours=5)
-                except Exception:
-                    pass
-
-            if os.path.exists(transcript_path):
-                with open(transcript_path, "r", encoding="utf-8") as f:
-                    for line in f:
-                        if '"type":"PLANNER_RESPONSE"' in line:
-                            try:
-                                step = json.loads(line)
-                                if step.get("type") == "PLANNER_RESPONSE":
-                                    if quota_start_dt:
-                                        created_at = step.get("created_at")
-                                        if created_at:
-                                            req_dt = datetime.datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-                                            if req_dt >= quota_start_dt:
-                                                req_count += 1
-                                        else:
-                                            req_count += 1
-                                    else:
-                                        req_count += 1
-                            except Exception:
-                                req_count += 1
-
-            today_reqs = 0
-            today_date = datetime.date.today()
-            local_midnight = datetime.datetime.combine(today_date, datetime.time.min).timestamp()
-            brain_dir = "/Users/ray/.gemini/antigravity-cli/brain"
-            if os.path.exists(brain_dir):
-                for conv_dir in os.listdir(brain_dir):
-                    t_path = os.path.join(brain_dir, conv_dir, ".system_generated/logs/transcript.jsonl")
-                    if os.path.exists(t_path):
-                        try:
-                            # Optimize: Only read files modified today
-                            if os.path.getmtime(t_path) >= local_midnight:
-                                with open(t_path, "r", encoding="utf-8") as f:
-                                    for line in f:
-                                        if '"type":"PLANNER_RESPONSE"' in line:
-                                            idx = line.find('"created_at":"')
-                                            if idx != -1:
-                                                # Extract ISO timestamp e.g. 2026-06-08T14:06:52Z
-                                                iso_str = line[idx+14 : idx+34]
-                                                try:
-                                                    dt_utc = datetime.datetime.fromisoformat(iso_str.replace('Z', '+00:00'))
-                                                    dt_local = dt_utc.astimezone()
-                                                    if dt_local.date() == today_date:
-                                                        today_reqs += 1
-                                                except Exception:
-                                                    pass
-                        except Exception:
-                            pass
-
-            if req_count > 0:
-                if today_reqs > 0:
-                    parts.append(f"💬 Reqs: {BOLD}{YELLOW}{req_count}{RESET}/{today_reqs}")
-                else:
-                    parts.append(f"💬 Reqs: {BOLD}{YELLOW}{req_count}{RESET}")
+            rem, ms, _ = get_quota_info(raw_model_name)
         except Exception:
             pass
 
-    # Pending input count (Queue)
-    pending_inputs = data.get("pending_input_count", 0)
-    if pending_inputs > 0:
-        parts.append(f"📬 Queue: {BOLD}{YELLOW}{pending_inputs}{RESET}")
-
-    # Quota and rolling reset information
+    quota_str = ""
     if rem is not None:
         try:
-            used_pct = int((1 - rem) * 100)
+            quota_used_pct = int(round((1 - rem) * 100))
             time_str = format_reset_time(ms)
 
             # Dynamic coloring based on used percentage
-            if used_pct <= 50:
-                quota_color = GREEN
-            elif used_pct <= 80:
-                quota_color = YELLOW
+            if quota_used_pct <= 50:
+                quota_color = FG_GREEN
+            elif quota_used_pct <= 80:
+                quota_color = FG_YELLOW
             else:
-                quota_color = RED
+                quota_color = FG_RED
 
             reset_info = f" ({time_str})" if time_str else ""
-            parts.append(f"⏳ 5h: {BOLD}{quota_color}{used_pct}%{RESET}{reset_info}")
+            quota_str = f"{FG_GRAY}⏳ 5h {quota_color}{BOLD}{quota_used_pct}%{RESET}{reset_info}"
         except Exception:
             pass
 
-    # Agent execution state & Tool confirmation
-    is_confirming = data.get("tool_confirmation_pending", False)
-    state = data.get("agent_state") or data.get("status")
-    if is_confirming:
-        parts.append(f"[{BOLD}{RED}CONFIRM PENDING{RESET}]")
-    elif state:
-        state_color = GREEN if state.lower() == "idle" else CYAN
-        parts.append(f"[{state_color}{state.upper()}{RESET}]")
+    # Computed Values
+    pct_fmt = f"{used_pct:.1f}"
+    pct_int = int(used_pct)
 
-    # Join status bar with separator
-    separator = f" {RESET}| "
-    output = separator.join(parts)
-    print(output)
+    # State Indicator (No background colors)
+    s_lower = state.lower()
+    if s_lower == "idle":
+        s = f"{FG_BRIGHT_GREEN}{BOLD}● READY{RESET}"
+    elif s_lower == "thinking":
+        s = f"{FG_BRIGHT_YELLOW}{BOLD}◆ THINKING{RESET}"
+    elif s_lower == "working":
+        s = f"{FG_BRIGHT_CYAN}{BOLD}⚙ WORKING{RESET}"
+    elif s_lower == "tool_use":
+        s = f"{FG_BRIGHT_MAGENTA}{BOLD}🔧 TOOL{RESET}"
+    else:
+        s = f"{FG_BRIGHT_WHITE}{BOLD}⏳ {state.upper()}{RESET}"
+
+    # Workspace Folder Name
+    folder_str = ""
+    if cwd:
+        folder_name = os.path.basename(cwd)
+        folder_str = f"📁 {BOLD}{FG_WHITE}{folder_name}{RESET}"
+
+    # VCS Branch
+    v = ""
+    if vcs_branch:
+        dirty_str = "*" if vcs_dirty else ""
+        dirty_color = FG_RED if dirty_str else RESET
+        v = f" {MAGENTA}{vcs_branch}{dirty_color}{dirty_str}{RESET}"
+
+    # Sandbox Badge
+    if sandbox_enabled:
+        sb = f"🛡️ {BOLD}{FG_GREEN}Sandbox{RESET}"
+    else:
+        sb = f"🔓 {BOLD}{FG_RED}Host{RESET}"
+
+    # Context Bar (15 segments, fine-grain Unicode)
+    bar_len = 15
+    filled = (pct_int * bar_len) // 100
+    remainder = (pct_int * bar_len) % 100
+
+    if pct_int >= 90:
+        bar_color = FG_BRIGHT_RED
+    elif pct_int >= 60:
+        bar_color = FG_BRIGHT_YELLOW
+    else:
+        bar_color = FG_BRIGHT_WHITE
+
+    bar_parts = []
+    for i in range(bar_len):
+        if i < filled:
+            bar_parts.append("█")
+        elif i == filled:
+            if remainder >= 75:
+                bar_parts.append("▓")
+            elif remainder >= 50:
+                bar_parts.append("▒")
+            elif remainder >= 25:
+                bar_parts.append("░")
+            else:
+                bar_parts.append("·")
+        else:
+            bar_parts.append("·")
+    bar = "".join(bar_parts)
+
+    ctx = f"{FG_GRAY}ctx {bar_color}{bar} {NUM_COLOR}{pct_fmt}%{RESET}"
+
+    # Context Token Usage stats
+    cur_usage = context.get("current_usage") or {}
+    in_t = cur_usage.get("input_tokens", 0)
+    out_t = cur_usage.get("output_tokens", 0)
+    cache_t = cur_usage.get("cache_read_input_tokens", 0)
+
+    # Get accumulated cache read tokens for the session
+    total_cache_t = get_session_cache(conversation_id, total_in, total_out, cache_t)
+
+    def fmt_num(n):
+        if n >= 1000:
+            val = n / 1000
+            return f"{int(val)}k" if val.is_integer() else f"{val:.1f}k"
+        return str(n)
+
+    usage_str = f"[📥{fmt_num(in_t)}/{fmt_num(total_in)} 📤{fmt_num(out_t)}/{fmt_num(total_out)} ⚡{fmt_num(cache_t)}/{fmt_num(total_cache_t)}]"
+
+    # Stats
+    art_fmt = f"{FG_GRAY}artifacts {NUM_COLOR}{artifacts}{RESET}"
+    sub_fmt = f"{FG_GRAY}subagents {NUM_COLOR}{subagents}{RESET}"
+    bg_fmt = f"{FG_GRAY}tasks {NUM_COLOR}{task_count}{RESET}"
+
+    # Pending Input Count (Queue)
+    pending_inputs = data.get("pending_input_count", 0)
+    queue_str = ""
+    if pending_inputs > 0:
+        queue_str = f"📬 Queue: {BOLD}{FG_BRIGHT_YELLOW}{pending_inputs}{RESET}"
+
+    # Separators
+    dot = f"{FG_GRAY} · {RESET}"
+
+    # Output Layout (Always single-line)
+    line1 = s
+    if v:
+        line1 += f" ╱ {v}"
+
+    # Construct line2 items dynamically
+    stats = [ctx, usage_str]
+    if quota_str:
+        stats.append(quota_str)
+    stats.extend([art_fmt, sub_fmt, bg_fmt])
+    if queue_str:
+        stats.append(queue_str)
+    stats.append(sb)
+    if folder_str:
+        stats.append(folder_str)
+    line2 = dot.join(stats)
+
+    print(f"{line1}{FG_GRAY} · {RESET}{line2}")
 
 if __name__ == "__main__":
     main()
