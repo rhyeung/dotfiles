@@ -112,35 +112,6 @@ def main():
     model = data.get("model") or {}
     raw_model_name = model.get("display_name") or model.get("id") or ""
 
-    # Authentication credentials check
-    settings_path = "/Users/ray/.gemini/antigravity-cli/settings.json"
-    use_g1 = False
-    if os.path.exists(settings_path):
-        try:
-            with open(settings_path, "r") as f:
-                settings_data = json.load(f)
-                use_g1 = settings_data.get("useG1Credits", False)
-        except Exception:
-            pass
-
-    api_key = os.environ.get("ANTIGRAVITY_API_KEY")
-    if api_key and use_g1:
-        parts.append(f"🔑 {BOLD}{CYAN}Key{RESET}")
-    else:
-        cache_path = "/Users/ray/.gemini/antigravity-cli/scratch/quota_cache.json"
-        email = None
-        if os.path.exists(cache_path):
-            try:
-                with open(cache_path, "r") as f:
-                    cache_data = json.load(f)
-                    email = cache_data.get("email")
-            except Exception:
-                pass
-        if email:
-            parts.append(f"📧 {BOLD}{CYAN}Login{RESET}")
-        else:
-            parts.append(f"📧 {BOLD}{RED}No Login{RESET}")
-
     # Fetch quota info for current model
     rem, ms, reset_time = None, None, None
     if raw_model_name:
