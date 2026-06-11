@@ -319,20 +319,20 @@ def main():
 
     # Output Layout (Always single-line)
     line1 = s
-    if v:
-        line1 += f" ╱ {v}"
 
     # Construct line2 items dynamically
     stats = [ctx, usage_str]
     if quota_str:
         stats.append(quota_str)
-    stats.extend([art_fmt, sub_fmt, bg_fmt])
     if queue_str:
         stats.append(queue_str)
+    stats.extend([art_fmt, sub_fmt, bg_fmt])
     stats.append(sb)
     if folder_str:
         stats.append(folder_str)
     line2 = dot.join(stats)
+    if v:
+        line2 += f"{FG_GRAY} ╱ {RESET}{v}"
 
     print(f"{line1}{FG_GRAY} · {RESET}{line2}")
 
