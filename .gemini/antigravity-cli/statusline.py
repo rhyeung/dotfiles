@@ -2,77 +2,57 @@
 import sys
 import json
 import os
-import time
 import subprocess
 
-def format_reset_time(ms):
-    if ms is None:
+# ANSI Helpers (Standard 16-colour palette only)
+RESET = "\033[0m"
+BOLD = "\033[1m"
+MAGENTA = "\033[35m"
+
+# Foreground accents (Standard 16 colours)
+FG_GRAY = "\033[90m"
+FG_RED = "\033[31m"
+FG_GREEN = "\033[32m"
+FG_YELLOW = "\033[33m"
+FG_WHITE = "\033[37m"
+FG_BRIGHT_RED = "\033[91m"
+FG_BRIGHT_GREEN = "\033[92m"
+FG_BRIGHT_YELLOW = "\033[93m"
+FG_BRIGHT_MAGENTA = "\033[95m"
+FG_BRIGHT_CYAN = "\033[96m"
+FG_BRIGHT_WHITE = "\033[97m"
+
+# Number Highlight Colour
+NUM_COLOR = FG_BRIGHT_WHITE + BOLD
+
+def get_quota_color(used_pct):
+    if used_pct <= 50:
+        return FG_GREEN
+    if used_pct <= 75:
+        return FG_YELLOW
+    return FG_RED
+
+def format_reset_time(seconds, detailed=True):
+    if seconds is None:
         return ""
-    seconds = int(ms / 1000)
     if seconds <= 0:
         return "now"
+
+    days = seconds // 86400
+    if days >= 1:
+        return f"{days}d"
+
     hours = seconds // 3600
     minutes = (seconds % 3600) // 60
+
     if hours > 0:
-        return f"{hours}h {minutes}m"
+        if detailed:
+            return f"{hours}h {minutes}m"
+        return f"{hours}h"
+
+    if minutes <= 0:
+        return "now"
     return f"{minutes}m"
-
-def get_quota_info(model_label):
-    if not model_label:
-        return None, None, None
-
-    cache_path = "/Users/ray/.gemini/antigravity-cli/scratch/quota_cache.json"
-    now = time.time()
-
-    # Try reading cache
-    cache_data = None
-    if os.path.exists(cache_path):
-        try:
-            with open(cache_path, "r") as f:
-                cache_data = json.load(f)
-        except Exception:
-            pass
-
-    # Check if cache is expired (30 seconds)
-    is_expired = True
-    if cache_data and "timestamp" in cache_data:
-        if now - cache_data["timestamp"] < 30:
-            is_expired = False
-
-    if is_expired:
-        try:
-            # Run the command asynchronously to update the cache file in the background
-            update_script = (
-                f"antigravity-usage quota --json > {cache_path}.tmp && "
-                f"python3 -c 'import json, time; d=json.load(open(\"{cache_path}.tmp\")); d[\"timestamp\"]=time.time(); json.dump(d, open(\"{cache_path}\", \"w\"))' && "
-                f"rm -f {cache_path}.tmp"
-            )
-            subprocess.Popen(update_script, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception:
-            pass
-
-    # Use existing cache data if available
-    if cache_data and "models" in cache_data:
-        target = model_label.lower().strip()
-        normalized_target = target.replace("gemini ", "").replace(" (medium)", "").replace(" (high)", "").replace(" (low)", "").strip()
-
-        best_match = None
-        for m in cache_data["models"]:
-            m_label = m.get("label", "").lower().strip()
-            m_id = m.get("modelId", "").lower().strip()
-
-            # Exact matches
-            if target == m_label or target == m_id:
-                return m.get("remainingPercentage"), m.get("timeUntilResetMs"), m.get("resetTime")
-
-            # Secondary heuristic matches
-            if normalized_target and (normalized_target in m_label or normalized_target in m_id):
-                best_match = m
-
-        if best_match:
-            return best_match.get("remainingPercentage"), best_match.get("timeUntilResetMs"), best_match.get("resetTime")
-
-    return None, None, None
 
 def get_session_cache(conversation_id, total_in, total_out, msg_cache):
     if not conversation_id:
@@ -120,27 +100,6 @@ def main():
         # Fallback if stdin is empty or invalid JSON
         print("\033[1;36m🤖 Antigravity\033[0m · Ready")
         return
-
-    # ANSI Helpers (Standard 16-color palette only)
-    RESET = "\033[0m"
-    BOLD = "\033[1m"
-    MAGENTA = "\033[35m"
-
-    # Foreground accents (Standard 16 colors)
-    FG_GRAY = "\033[90m"
-    FG_RED = "\033[31m"
-    FG_GREEN = "\033[32m"
-    FG_YELLOW = "\033[33m"
-    FG_WHITE = "\033[37m"
-    FG_BRIGHT_RED = "\033[91m"
-    FG_BRIGHT_GREEN = "\033[92m"
-    FG_BRIGHT_YELLOW = "\033[93m"
-    FG_BRIGHT_MAGENTA = "\033[95m"
-    FG_BRIGHT_CYAN = "\033[96m"
-    FG_BRIGHT_WHITE = "\033[97m"
-
-    # Number Highlight Color
-    NUM_COLOR = FG_BRIGHT_WHITE + BOLD
 
     # Parse fields
     state = data.get("agent_state") or data.get("status") or "idle"
@@ -193,10 +152,25 @@ def main():
     raw_model_name = model.get("display_name") or model.get("id") or ""
 
     # Fetch quota info for current model
-    rem, ms, _ = None, None, None
-    if raw_model_name:
+    rem, reset_seconds = None, None
+    weekly_rem = None
+    weekly_reset_seconds = None
+    quota_data = data.get("quota") or {}
+    if quota_data:
         try:
-            rem, ms, _ = get_quota_info(raw_model_name)
+            model_is_gemini = "gemini" in raw_model_name.lower() or "google" in raw_model_name.lower()
+            key_5h = "gemini-5h" if model_is_gemini else "3p-5h"
+            key_weekly = "gemini-weekly" if model_is_gemini else "3p-weekly"
+
+            q_5h = quota_data.get(key_5h)
+            if q_5h:
+                rem = q_5h.get("remaining_fraction")
+                reset_seconds = q_5h.get("reset_in_seconds")
+
+            q_weekly = quota_data.get(key_weekly)
+            if q_weekly:
+                weekly_rem = q_weekly.get("remaining_fraction")
+                weekly_reset_seconds = q_weekly.get("reset_in_seconds")
         except Exception:
             pass
 
@@ -204,18 +178,27 @@ def main():
     if rem is not None:
         try:
             quota_used_pct = int(round((1 - rem) * 100))
-            time_str = format_reset_time(ms)
-
-            # Dynamic coloring based on used percentage
-            if quota_used_pct <= 50:
-                quota_color = FG_GREEN
-            elif quota_used_pct <= 80:
-                quota_color = FG_YELLOW
-            else:
-                quota_color = FG_RED
+            time_str = format_reset_time(reset_seconds, detailed=True)
+            quota_color = get_quota_color(quota_used_pct)
 
             reset_info = f" ({time_str})" if time_str else ""
             quota_str = f"{FG_GRAY}⏳ 5h {quota_color}{BOLD}{quota_used_pct}%{RESET}{reset_info}"
+
+            if weekly_rem is not None:
+                weekly_used_pct = int(round((1 - weekly_rem) * 100))
+                weekly_color = get_quota_color(weekly_used_pct)
+
+                bar_len = 15
+                filled_len = int(round(weekly_used_pct * bar_len / 100))
+                filled_len = max(0, min(bar_len, filled_len))
+                weekly_bar = "█" * filled_len + "░" * (bar_len - filled_len)
+
+                reset_info_weekly = ""
+                if weekly_reset_seconds is not None:
+                    time_str_weekly = format_reset_time(weekly_reset_seconds, detailed=False)
+                    reset_info_weekly = f" ({time_str_weekly})" if time_str_weekly else ""
+
+                quota_str += f" {FG_GRAY}Wk {weekly_color}[{weekly_bar}] {BOLD}{weekly_color}{weekly_used_pct}%{RESET}{reset_info_weekly}"
         except Exception:
             pass
 
@@ -223,7 +206,7 @@ def main():
     pct_fmt = f"{used_pct:.1f}"
     pct_int = int(used_pct)
 
-    # State Indicator (No background colors)
+    # State Indicator (No background colours)
     s_lower = state.lower()
     if s_lower == "idle":
         s = f"{FG_BRIGHT_GREEN}{BOLD}● READY{RESET}"
@@ -255,36 +238,15 @@ def main():
     else:
         sb = f"🔓 {BOLD}{FG_RED}Host{RESET}"
 
-    # Context Bar (15 segments, fine-grain Unicode)
-    bar_len = 15
-    filled = (pct_int * bar_len) // 100
-    remainder = (pct_int * bar_len) % 100
-
+    # Context Percentage with Card Index icon
     if pct_int >= 90:
-        bar_color = FG_BRIGHT_RED
+        ctx_color = FG_BRIGHT_RED
     elif pct_int >= 60:
-        bar_color = FG_BRIGHT_YELLOW
+        ctx_color = FG_BRIGHT_YELLOW
     else:
-        bar_color = FG_BRIGHT_WHITE
+        ctx_color = NUM_COLOR
 
-    bar_parts = []
-    for i in range(bar_len):
-        if i < filled:
-            bar_parts.append("█")
-        elif i == filled:
-            if remainder >= 75:
-                bar_parts.append("▓")
-            elif remainder >= 50:
-                bar_parts.append("▒")
-            elif remainder >= 25:
-                bar_parts.append("░")
-            else:
-                bar_parts.append("·")
-        else:
-            bar_parts.append("·")
-    bar = "".join(bar_parts)
-
-    ctx = f"{FG_GRAY}ctx {bar_color}{bar} {NUM_COLOR}{pct_fmt}%{RESET}"
+    ctx = f"🗂️ {ctx_color}{pct_fmt}%{RESET}"
 
     # Context Token Usage stats
     cur_usage = context.get("current_usage") or {}
