@@ -73,14 +73,23 @@ def get_session_cache(conversation_id, total_in, total_out, msg_cache):
         "accumulated_cache_read_tokens": 0
     }
 
-    is_new_turn = (
-        total_in != entry["last_total_input_tokens"] or
-        total_out != entry["last_total_output_tokens"]
-    )
+    # Check if this is a new API call (input tokens changed) or just streaming (only output tokens changed)
+    input_changed = total_in != entry["last_total_input_tokens"]
+    is_new_session = entry["last_total_input_tokens"] == 0 and entry["last_total_output_tokens"] == 0
 
-    if is_new_turn:
+    if input_changed or is_new_session:
+        # New turn or new tool step: accumulate the cache read tokens
         entry["accumulated_cache_read_tokens"] += msg_cache
         entry["last_total_input_tokens"] = total_in
+        entry["last_total_output_tokens"] = total_out
+        data[conversation_id] = entry
+        try:
+            with open(cache_path, "w") as f:
+                json.dump(data, f)
+        except Exception:
+            pass
+    elif total_out != entry["last_total_output_tokens"]:
+        # Streaming update: just update the output token count without accumulating cache again
         entry["last_total_output_tokens"] = total_out
         data[conversation_id] = entry
         try:
@@ -155,7 +164,75 @@ def main():
     rem, reset_seconds = None, None
     weekly_rem = None
     weekly_reset_seconds = None
+
+    # Try to get quota from the stdin payload
     quota_data = data.get("quota") or {}
+
+    # Check if the external npm tool is available for the hybrid fallback
+    import shutil
+    has_external_cli = shutil.which("antigravity-usage") is not None
+
+    if has_external_cli:
+        # Asynchronously maintain an independent background cache as a robust fallback
+        cache_path = "/Users/ray/.gemini/antigravity-cli/scratch/quota_cache.json"
+        import time
+        now = time.time()
+        cache_data = None
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, "r") as f:
+                    cache_data = json.load(f)
+            except Exception:
+                pass
+
+        # Refresh the background cache if it is older than 5 minutes
+        is_expired = True
+        if cache_data and "timestamp" in cache_data:
+            if now - cache_data["timestamp"] < 300:
+                is_expired = False
+
+        if is_expired:
+            try:
+                # Run the command asynchronously to update the cache file in the background
+                update_script = (
+                    f"antigravity-usage quota --json > {cache_path}.tmp && "
+                    f"python3 -c 'import json, time; d=json.load(open(\"{cache_path}.tmp\")); d[\"timestamp\"]=time.time(); json.dump(d, open(\"{cache_path}\", \"w\"))' && "
+                    f"rm -f {cache_path}.tmp"
+                )
+                subprocess.Popen(update_script, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except Exception:
+                pass
+
+        # If stdin quota is missing or stale, fall back to the background cache
+        if not quota_data and cache_data and "models" in cache_data:
+            quota_data = {}
+            for m in cache_data.get("models", []):
+                m_id = m.get("modelId", "").lower()
+                m_label = m.get("label", "").lower()
+
+                # Check if this model matches our active model
+                model_match = False
+                if raw_model_name:
+                    target = raw_model_name.lower().strip()
+                    normalized_target = target.replace("gemini ", "").replace(" (medium)", "").replace(" (high)", "").replace(" (low)", "").strip()
+                    if target == m_id or target == m_label:
+                        model_match = True
+                    elif normalized_target and (normalized_target in m_id or normalized_target in m_label):
+                        model_match = True
+
+                if model_match:
+                    # Map the flat cache structure to the nested structure expected by the status line
+                    model_is_gemini = "gemini" in raw_model_name.lower() or "google" in raw_model_name.lower()
+                    key_5h = "gemini-5h" if model_is_gemini else "3p-5h"
+
+                    # Note: The background utility only returns a single 5h quota, so we map it to key_5h
+                    quota_data[key_5h] = {
+                        "remaining_fraction": m.get("remainingPercentage"),
+                        "reset_in_seconds": int(m.get("timeUntilResetMs", 0) / 1000)
+                    }
+                    break
+
+    # Parse the resolved quota data
     if quota_data:
         try:
             model_is_gemini = "gemini" in raw_model_name.lower() or "google" in raw_model_name.lower()
